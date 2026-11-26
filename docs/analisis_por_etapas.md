@@ -1,5 +1,7 @@
 # Análisis por etapas: mecánico, eléctrico y de software
 
+> Los cálculos de autonomía, consumo, caudal y visión están en [calculos.md](calculos.md).
+
 Objetivo del proyecto: *desarrollar de manera funcional el sistema contador de monedas con su transporte y embalaje,
 seguido de su sistema de recolección y direccionamiento a la meta final.*
 
@@ -56,7 +58,7 @@ rampa corriendo mientras atiende la serie.
 
 **Mecánico.** 5 vasos Ø42 × 45 mm (interior Ø36 > moneda mayor 26 mm + 8 mm de holgura) en un arco de R = 110 mm
 alrededor del pivote del servo, en los ángulos 20/45/90/135/160°. Cada vaso guarda la moneda **actual y la antigua** de
-su valor. Capacidad ≈ 15–20 monedas (espesor ≈ 2 mm, apilado irregular) → ≤ 150 g. La canaleta baja de 78 a 54 mm:
+su valor. Capacidad ≈ 24 monedas de $1000 hasta ≈ 56 de $50 (espesor ≈ 2 mm, 60 % de aprovechamiento) → ≤ 212 g; ver [calculos.md](calculos.md). La canaleta baja de 78 a 54 mm:
 **pendiente 14°**, poca para deslizar desde reposo (una moneda sobre plástico pide ≈ 17–22°), así que depende del
 impulso de la banda y de un canal liso **(sin medir)**. Validado en malla: la canaleta no choca con vasos ni torre en
 ningún ángulo (`cad/generar_cad.py --check`). Torque: un SG90 da ≈ 1,8 kg·cm **(típico)** y la canaleta (≈ 18 g, giro
@@ -78,7 +80,7 @@ que elegir entre banda suave o servo preciso.
 ## Etapa 4 · Recolección y direccionamiento a la meta
 
 **Mecánico.** El carro (170 × 240 mm) retrocede, engancha la **oreja** del vaso con un pasador Ø5,4 y lo remolca. La
-fuerza de arrastre es mínima: vaso + monedas ≈ 120–170 g con μ ≈ 0,4 → ≈ 0,5–0,7 N **(estimado)**. La pista tiene
+fuerza de arrastre es mínima: vaso + monedas ≈ 0,23 kg con μ ≈ 0,4 → ≈ 0,9 N **(estimado)**. La pista tiene
 3 tramos rectos (91/66/93 cm), 2 retornos en U de Ø32 cm y 3 termos Ø90 mm; el recorrido plan mide ≈ 3,5 m en
 ≈ 17,8 s (≈ 200 mm/s) con `V_AVANCE = 250` y `T_GIRO90 = 450` **provisionales**. El carro tiende a irse a la
 derecha: se compensa con avance controlado (`F1000` + `L40`) y con el factor de ruedas `K`.

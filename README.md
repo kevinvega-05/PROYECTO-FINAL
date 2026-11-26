@@ -16,7 +16,7 @@ con dos retornos en U y tres obstáculos. Un **tablero Streamlit** muestra canti
 
 | Parte | Estado |
 |---|---|
-| Software (visión, planificador, despacho, chatbot, tablero, generador de ruta) | Funciona en **demo/simulación**; 74 pruebas automáticas pasan. La visión con monedas reales se calibró en el banco con la cámara del celular. |
+| Software (visión, planificador, despacho, chatbot, tablero, generador de ruta) | Funciona en **demo/simulación**; 80 pruebas automáticas pasan. La visión con monedas reales se calibró en el banco con la cámara del celular. |
 | Firmware ESP32 (estación) y Arduino UNO (carro) | Revisados y consistentes con el software por pruebas estáticas, **sin compilar ni probar en CI**; la estación se ha movido (banda y servo se mueven), la banda aún no arrastra bien. |
 | Piezas 3D (STL) | **Generadas por código y validadas en la malla** (herméticas, caben en 220 mm, sin choques de la canaleta). **No se han impreso.** Las medidas marcadas `[?]` en `cad/parametros.py` son supuestos: verifícalos con pie de rey. |
 | Pista | Largos medidos de los tramos rectos (91 / 66 / 93 cm); separación entre ejes (32 cm) y velocidad/giro del carro son **provisionales**. |
@@ -29,6 +29,9 @@ El requisito (sistema contador funcional con transporte y embalaje, recolección
 mecánico, eléctrico y de software por etapa y la importancia del ESP32) se desarrolla en
 **[docs/analisis_por_etapas.md](docs/analisis_por_etapas.md)**, con una matriz de cumplimiento al final. El ESP32 es el
 corazón de la estación (banda + servo + sensor); el carro todavía usa Arduino UNO y el documento explica la mejora.
+
+Los **cálculos de ingeniería** (autonomía del carro, consumo, caudal de la banda, capacidad de vasos, resolución de la visión)
+están en **[docs/calculos.md](docs/calculos.md)** y se recalculan con tus mediciones: `python -m monedas.calculos --bateria-mah 2600`.
 
 ## Arquitectura
 
@@ -83,7 +86,7 @@ python -m monedas --fuente http://192.168.1.50:8080/video --puerto COM5 --carro-
 | `cad/` | `parametros.py` + `generar_cad.py` → STL, `escena.glb`, `PIEZAS.md` |
 | `visor3d/` | Fuente del visor (three.js) y `construir.py` que lo empaqueta en `docs/visor3d.html` |
 | `docs/` | Análisis por etapas, guías, diagramas y capturas |
-| `tests/` | 74 pruebas (software, protocolo del carro, firmware↔software, CAD) |
+| `tests/` | 80 pruebas (software, protocolo del carro, firmware↔software, CAD) |
 | `legacy/` | Versión anterior (carrusel de 9 cubículos + PyBullet), conservada como referencia |
 
 ## Piezas 3D
@@ -122,7 +125,7 @@ Guía completa: [docs/calibracion.md](docs/calibracion.md).
 
 ```bash
 pip install -r requirements-dev.txt
-python -m pytest        # 74 pruebas, ~1 min
+python -m pytest        # 80 pruebas, ~1 min
 ruff check .
 ```
 
