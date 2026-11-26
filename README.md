@@ -301,7 +301,7 @@ En la estación hay que mover una banda **suave** (1 kHz) y un servo **preciso**
 | Capacidad de un vaso | de 24 monedas de \$1000 a 56 de \$50 |
 | Pendiente de la canaleta | **14°** (limitada por la altura de la banda) |
 
-## Gemelo digital en 3D
+## 3D
 
 `python cad/generar_cad.py` genera **11 piezas STL** imprimibles y la escena completa; [`docs/visor3d.html`](docs/visor3d.html) la muestra a escala real
 con el carro recorriendo **la misma ruta** que se envía por Bluetooth, la canaleta apuntando al vaso elegido y una moneda que cae.
@@ -329,7 +329,7 @@ con el carro recorriendo **la misma ruta** que se envía por Bluetooth, la canal
   los vasos (48 mm). Esa caída de 24 mm en 96 mm da **14°**: es el punto débil del diseño (una moneda sobre plástico suele pedir 17–22°),
   por eso la moneda depende del impulso de la banda y conviene un canal liso. El validador de `generar_cad.py` lo avisa si baja de 18°.
 
-### Catálogo de piezas imprimibles
+### Piezas
 
 > Versión interactiva para girar y medir cada pieza: [`docs/piezas3d.html`](docs/piezas3d.html) (se abre en el navegador, sin instalar nada).
 
@@ -467,9 +467,9 @@ make cad && make visor      # regenerar piezas y visor 3D
 
 CI (`.github/workflows/ci.yml`): pruebas, ruff, demo sin ventana, generación del CAD y del visor.
 
-## Lo que faltó: balance honesto del proyecto
+## Lo que faltó
 
-> **En una frase:** cada etapa funcionó *por separado*, pero **no alcanzamos a ver las cuatro funcionando juntas de principio a fin**. Esta sección dice qué falló, por qué creemos que falló y qué haríamos con más tiempo. Lo que es causa *probable* (no medida) está marcado así.
+> **En una frase:** cada etapa funcionó *por separado*, pero **no alcanzamos a ver las cuatro funcionando juntas de principio a fin**.
 
 ```mermaid
 flowchart LR
