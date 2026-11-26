@@ -1,0 +1,13 @@
+fecha,evento,valor,cubiculo,detalle
+2026-11-25 21:27:03,camara,100,1,cruzo la linea
+2026-11-25 21:27:04,moneda,100,1,100_actual
+2026-11-25 21:27:06,camara,1000,4,cruzo la linea
+2026-11-25 21:27:08,moneda,1000,4,1000_actual
+2026-11-25 21:27:10,camara,50,0,cruzo la linea
+2026-11-25 21:27:11,moneda,50,0,50_actual
+2026-11-25 21:27:13,camara,500,3,cruzo la linea
+2026-11-25 21:27:15,moneda,500,3,500_actual
+2026-11-25 21:27:17,camara,200,2,cruzo la linea
+2026-11-25 21:27:18,moneda,200,2,200_antigua
+2026-11-25 21:27:20,camara,,,cruzo la linea
+2026-11-25 21:27:21,moneda,,,no reconocida -> rechazo

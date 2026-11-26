@@ -1,0 +1,6 @@
+pybullet>=3.2.5
+numpy>=1.24
+opencv-python>=4.8
+requests>=2.31
+# Opcional: voz del chatbot (chatbot.py funciona sin esto)
+pyttsx3>=2.90

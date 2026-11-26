@@ -1,0 +1,9 @@
+{
+  "name": "visor3d",
+  "private": true,
+  "description": "Visor 3D del sistema de monedas (se empaqueta en un unico HTML con construir.py)",
+  "devDependencies": {
+    "esbuild": "0.25.0",
+    "three": "0.160.0"
+  }
+}

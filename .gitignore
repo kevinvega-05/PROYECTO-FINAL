@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+.venv/
+node_modules/
+visor3d/bundle.js
+visor3d/package-lock.json
+# datos generados al ejecutar
+datos/*.json
+datos/*.png
+!datos/.gitkeep

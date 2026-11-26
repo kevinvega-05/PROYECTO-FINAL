@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sistema-monedas-inteligentes"
+version = "1.0.0"
+description = "Sistema logístico de monedas inteligentes: visión, banda, canaleta con servo, 5 vasos y carro remolcador (UMNG)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Kevin" }]
+dependencies = [
+    "numpy>=1.24",
+    "opencv-python>=4.8",
+    "pyserial>=3.5",
+    "bleak>=0.21",
+    "streamlit>=1.37",
+]
+
+[project.optional-dependencies]
+voz = ["pyttsx3>=2.90"]
+cad = ["trimesh>=4.0", "manifold3d>=2.5", "shapely>=2.0", "mapbox-earcut>=1.0", "matplotlib>=3.7", "numpy>=1.24"]
+dev = ["pytest>=8", "ruff>=0.4", "pyflakes"]
+
+[project.scripts]
+monedas = "monedas.sistema:main"
+monedas-pista = "monedas.pista:cli"
+monedas-chatbot = "monedas.chatbot:main"
+
+[tool.setuptools]
+packages = ["monedas"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+extend-exclude = ["legacy"]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501", "E741", "E402", "I001", "E702", "E701", "E731"]

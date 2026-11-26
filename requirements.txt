@@ -1,0 +1,7 @@
+numpy>=1.24
+opencv-python>=4.8
+pyserial>=3.5
+bleak>=0.21
+streamlit>=1.37
+# opcional: voz del chatbot
+# pyttsx3>=2.90

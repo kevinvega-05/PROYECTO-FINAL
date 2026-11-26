@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Panel del carro</title>
+<style>
+/* Diseño: panel de control utilitario, tarjetas apiladas, números grandes para lo que se mira de reojo. */
+:root{
+  --bg:#eef1ef; --panel:#ffffff; --fg:#17201e; --muted:#5b6a66; --line:#d3dbd8;
+  --accent:#0b7a75; --accent-fg:#ffffff; --btn:#e3e9e6; --btn-fg:#17201e;
+  --ok:#1f8a4c; --warn:#b26a00; --bad:#c0392b; --log-bg:#101614; --log-fg:#cfe3dc;
+  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#101513; --panel:#182019; --fg:#e4ece8; --muted:#9bb0a8; --line:#2b3a34;
+    --accent:#3cc2b6; --accent-fg:#06211e; --btn:#25332d; --btn-fg:#e4ece8;
+    --ok:#52c98a; --warn:#e3a13c; --bad:#ff7a6b; --log-bg:#0a0f0d; --log-fg:#bfd8cf;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101513; --panel:#182019; --fg:#e4ece8; --muted:#9bb0a8; --line:#2b3a34;
+  --accent:#3cc2b6; --accent-fg:#06211e; --btn:#25332d; --btn-fg:#e4ece8;
+  --ok:#52c98a; --warn:#e3a13c; --bad:#ff7a6b; --log-bg:#0a0f0d; --log-fg:#bfd8cf;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 var(--font);
+  padding:max(12px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 32px max(16px,env(safe-area-inset-left,0px))}
+.wrap{max-width:760px;margin:0 auto;display:grid;gap:14px}
+header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+h1{font-size:1.35rem;margin:0;letter-spacing:.01em}
+h2{font-size:.78rem;margin:0 0 10px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:700}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
+button{font:inherit;color:var(--btn-fg);background:var(--btn);border:1px solid var(--line);border-radius:8px;padding:10px 14px;cursor:pointer;min-height:44px}
+button:hover{filter:brightness(.97)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--accent);color:var(--accent-fg);border-color:transparent;font-weight:700}
+button.danger{background:var(--bad);color:#fff;border-color:transparent;font-weight:700}
+button:disabled{opacity:.45;cursor:not-allowed}
+input,textarea,select{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px;min-width:0}
+textarea{width:100%;font-family:var(--mono);font-size:.9rem;resize:vertical}
+label{display:flex;flex-direction:column;gap:4px;font-size:.82rem;color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:.85rem;font-weight:600;background:var(--panel)}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--muted)}
+.chip.ok .dot{background:var(--ok)} .chip.warn .dot{background:var(--warn)} .chip.bad .dot{background:var(--bad)}
+.status{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.stat{border:1px solid var(--line);border-radius:8px;padding:10px;min-width:0}
+.stat b{display:block;font-size:.74rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.stat span{display:block;font-size:1.05rem;font-weight:700;margin-top:3px;overflow-wrap:anywhere}
+.big{font-size:2rem !important;font-variant-numeric:tabular-nums}
+.ok-t{color:var(--ok)} .warn-t{color:var(--warn)} .bad-t{color:var(--bad)}
+#veredicto{margin-top:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg)}
+.pad{display:grid;grid-template-columns:repeat(3,minmax(0,84px));grid-template-rows:repeat(3,72px);gap:8px;justify-content:center;touch-action:none;user-select:none;-webkit-user-select:none}
+.pad button{min-height:0;height:100%;font-size:1.5rem;touch-action:none;-webkit-touch-callout:none}
+.pad .stop{background:var(--bad);color:#fff;border-color:transparent;font-weight:700;font-size:1rem}
+.pad .u{grid-column:2;grid-row:1}.pad .l{grid-column:1;grid-row:2}.pad .s{grid-column:2;grid-row:2}.pad .r{grid-column:3;grid-row:2}.pad .d{grid-column:2;grid-row:3}
+.pad button.hold{background:var(--accent);color:var(--accent-fg)}
+.manual{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));align-items:center}
+input[type=range]{width:100%;padding:0}
+#log{background:var(--log-bg);color:var(--log-fg);font:12.5px/1.5 var(--mono);border-radius:8px;padding:10px;height:230px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}
+#log .tx{color:#7fd1ff} #log .rx{color:#a6f0a0} #log .sys{color:#f3c26b} #log .err{color:#ff8f86}
+.hint{color:var(--muted);font-size:.85rem;margin:6px 0 0}
+.calc{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+@media (prefers-reduced-motion: no-preference){ button{transition:background .12s,filter .12s} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Panel del carro</h1>
+    <div class="row" style="align-items:center">
+      <span id="chipBt" class="chip bad"><span class="dot"></span><span id="chipTxt">Sin conexión</span></span>
+      <button id="btnConectar" class="primary">Conectar</button>
+    </div>
+  </header>
+
+  <section class="card" aria-labelledby="h-diag">
+    <h2 id="h-diag">Conexión y diagnóstico</h2>
+    <div class="status">
+      <div class="stat"><b>Bluetooth</b><span id="sBt">Desconectado</span></div>
+      <div class="stat"><b>Datos del carro</b><span id="sRx">Ninguno todavía</span></div>
+      <div class="stat"><b>Código nuevo</b><span id="sCodigo">Sin probar</span></div>
+      <div class="stat"><b>Distancia al frente</b><span id="sDist" class="big">-- cm</span></div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button id="btnProbar" disabled>Probar comunicación</button>
+      <span class="hint" id="hintProbar">Primero conecta el carro.</span>
+    </div>
+    <div id="veredicto" hidden></div>
+  </section>
+
+  <section class="card" aria-labelledby="h-man">
+    <h2 id="h-man">Control manual</h2>
+    <div class="manual">
+      <div class="pad" id="pad">
+        <button class="u" data-m="1,1" aria-label="Adelante">&#9650;</button>
+        <button class="l" data-m="-1,1" aria-label="Girar a la izquierda">&#9664;</button>
+        <button class="s stop" id="btnParar">PARAR</button>
+        <button class="r" data-m="1,-1" aria-label="Girar a la derecha">&#9654;</button>
+        <button class="d" data-m="-1,-1" aria-label="Atrás">&#9660;</button>
+      </div>
+      <div>
+        <label for="vel"><span>Velocidad: <b id="velTxt">180</b> de 255</span></label>
+        <input id="vel" type="range" min="80" max="255" value="180">
+        <p class="hint">Mantén pulsada una flecha para mover el carro; al soltar se detiene. En el computador también sirven las flechas del teclado y la barra espaciadora.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="h-ruta">
+    <h2 id="h-ruta">Ruta por tramos</h2>
+    <label for="ruta">Tramos separados por coma: letra + milisegundos (F adelante, B reversa, L giro izquierda, R giro derecha, S pausa)</label>
+    <textarea id="ruta" rows="4" spellcheck="false">F1000,L450,F1000,R450,F500</textarea>
+    <div class="row" style="margin-top:10px">
+      <button id="btnRuta" class="primary" disabled>Ejecutar ruta</button>
+      <button id="btnX" class="danger" disabled>Cancelar (X)</button>
+      <span id="rutaInfo" class="hint"></span>
+    </div>
+    <div class="calc">
+      <h2>Pruebas y calibración</h2>
+      <div class="row">
+        <label for="msPrueba">Tiempo (ms)<input id="msPrueba" type="number" min="50" max="60000" step="50" value="2000" style="width:110px"></label>
+        <button data-t="F" disabled>Avanzar</button>
+        <button data-t="B" disabled>Retroceder</button>
+        <button data-t="L" disabled>Girar izq.</button>
+        <button data-t="R" disabled>Girar der.</button>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <label for="mmMedidos">Distancia que avanzó (mm)<input id="mmMedidos" type="number" min="0" step="5" style="width:150px"></label>
+        <div class="stat" style="min-width:170px"><b>Velocidad medida</b><span id="vMedida">-- mm/s</span></div>
+      </div>
+      <p class="hint">Avanza 2000 ms, mide cuánto recorrió y escríbelo: la velocidad va en <code>V_AVANCE</code> de <code>pista.py</code>. Para el giro prueba tiempos hasta lograr 90° exactos: ese valor es <code>T_GIRO90</code>.</p>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="h-aj">
+    <h2 id="h-aj">Ajustes del carro</h2>
+    <div class="row">
+      <label for="aU">Avance (U)<input id="aU" type="number" min="60" max="255" value="200" style="width:90px"></label>
+      <label for="aW">Reversa (W)<input id="aW" type="number" min="60" max="255" value="170" style="width:90px"></label>
+      <label for="aG">Giro (G)<input id="aG" type="number" min="60" max="255" value="180" style="width:90px"></label>
+      <label for="aN">Freno en ruta (cm)<input id="aN" type="number" min="0" max="100" value="8" style="width:100px"></label>
+      <button id="btnAjustes" disabled>Enviar ajustes</button>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <label for="kI">Rueda izq. (%)<input id="kI" type="number" min="10" max="100" value="100" style="width:90px"></label>
+      <label for="kD">Rueda der. (%)<input id="kD" type="number" min="10" max="100" value="50" style="width:90px"></label>
+      <button id="btnK" disabled>Enviar K</button>
+      <button data-cmd="K?" disabled>Ver K</button>
+      <button data-cmd="T" disabled>Prueba de ruedas (T)</button>
+      <button data-cmd="Q" disabled>Estado (Q)</button>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="h-log">
+    <h2 id="h-log">Registro</h2>
+    <div id="log" role="log" aria-live="polite"></div>
+    <div class="row" style="margin-top:10px">
+      <label for="raw" style="flex:1 1 200px">Enviar texto<input id="raw" type="text" placeholder="Ej: Q" autocomplete="off" autocapitalize="characters"></label>
+      <button id="btnRaw" disabled>Enviar</button>
+      <label style="flex-direction:row;align-items:center;gap:6px"><input id="verD" type="checkbox"> mostrar distancias (D)</label>
+      <button id="btnLimpiar">Limpiar</button>
+    </div>
+  </section>
+</div>
+
+<script>
+"use strict";
+// ---------- utilidades ----------
+const $ = (id) => document.getElementById(id);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const UUID_FFE0 = "0000ffe0-0000-1000-8000-00805f9b34fb";
+const UUID_FFE1 = "0000ffe1-0000-1000-8000-00805f9b34fb";
+const SERVICIOS_OPC = [UUID_FFE0, "0000fff0-0000-1000-8000-00805f9b34fb", "0000ffe5-0000-1000-8000-00805f9b34fb",
+                       "6e400001-b5a3-f393-e0a9-e50e24dcca9e", "0000180f-0000-1000-8000-00805f9b34fb"];
+const MAX_TRAMOS = 120, PEDAZO_MAX = 60;
+
+let device = null, writeCh = null, notifyCh = null, conectado = false;
+let ultimoRx = 0, codigoNuevo = null;   // null = sin probar, true/false
+let rxBuf = "", esperaQ = null, cola = Promise.resolve(), pendientes = 0;
+
+function log(txt, cls) {
+  const el = $("log");
+  const d = document.createElement("div");
+  d.className = cls || "";
+  const t = new Date().toLocaleTimeString("es-CO", { hour12: false });
+  d.textContent = t + "  " + txt;
+  el.appendChild(d);
+  while (el.childNodes.length > 400) el.removeChild(el.firstChild);
+  el.scrollTop = el.scrollHeight;
+}
+
+function setChip(clase, texto) {
+  $("chipBt").className = "chip " + clase;
+  $("chipTxt").textContent = texto;
+}
+
+function habilitar(on) {
+  document.querySelectorAll("button").forEach((b) => {
+    if (b.id === "btnConectar" || b.id === "btnLimpiar" || b.id === "btnParar") return;
+    if (b.closest("#pad")) return;
+    b.disabled = !on;
+  });
+  $("hintProbar").textContent = on ? "Envía Q y comprueba qué responde el carro." : "Primero conecta el carro.";
+}
+
+// ---------- Bluetooth ----------
+async function conectar() {
+  if (!navigator.bluetooth) {
+    setChip("bad", "Sin Web Bluetooth");
+    log("Este navegador no tiene Web Bluetooth. Usa Chrome en Android o en un computador (Windows, Mac, Linux). No funciona en iPhone/Safari.", "err");
+    return;
+  }
+  try {
+    setChip("warn", "Buscando…");
+    device = await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: SERVICIOS_OPC });
+    device.addEventListener("gattserverdisconnected", alDesconectar);
+    log("Conectando a " + (device.name || "dispositivo sin nombre") + "…", "sys");
+    const server = await device.gatt.connect();
+    let candidatos = [];
+    for (const svc of await server.getPrimaryServices()) {
+      for (const ch of await svc.getCharacteristics()) {
+        candidatos.push({ svc: svc.uuid, ch });
+        log("  servicio " + svc.uuid.slice(4, 8) + " / característica " + ch.uuid.slice(4, 8) +
+            " [" + Object.keys(ch.properties).filter((k) => ch.properties[k]).join(",") + "]", "sys");
+      }
+    }
+    const pref = candidatos.find((c) => c.ch.uuid === UUID_FFE1);
+    writeCh = (pref && pref.ch) || (candidatos.find((c) => c.ch.properties.write || c.ch.properties.writeWithoutResponse) || {}).ch || null;
+    notifyCh = (pref && pref.ch) || (candidatos.find((c) => c.ch.properties.notify || c.ch.properties.indicate) || {}).ch || null;
+    if (!writeCh) throw new Error("No encontré una característica para escribir. ¿Es el módulo correcto?");
+    if (notifyCh) {
+      await notifyCh.startNotifications();
+      notifyCh.addEventListener("characteristicvaluechanged", alRecibir);
+    } else {
+      log("No hay característica de notificación: puedo enviar pero no recibir.", "err");
+    }
+    conectado = true;
+    codigoNuevo = null; ultimoRx = 0; rxBuf = "";
+    setChip("ok", "Conectado");
+    $("sBt").textContent = device.name || "Conectado";
+    $("sBt").className = "ok-t";
+    $("btnConectar").textContent = "Desconectar";
+    habilitar(true);
+    log("Conectado. Pulsa «Probar comunicación».", "sys");
+    refrescar();
+  } catch (e) {
+    conectado = false;
+    setChip("bad", "Sin conexión");
+    log("No se pudo conectar: " + (e && e.message ? e.message : e), "err");
+  }
+}
+
+function alDesconectar() {
+  conectado = false; writeCh = null; notifyCh = null;
+  detenerManual();
+  setChip("bad", "Sin conexión");
+  $("sBt").textContent = "Desconectado"; $("sBt").className = "";
+  $("btnConectar").textContent = "Conectar";
+  habilitar(false);
+  log("Desconectado.", "err");
+}
+
+function alRecibir(ev) {
+  const txt = new TextDecoder().decode(ev.target.value);
+  rxBuf += txt;
+  let i;
+  while ((i = rxBuf.search(/[\r\n]/)) >= 0) {
+    const linea = rxBuf.slice(0, i).trim();
+    rxBuf = rxBuf.slice(i + 1);
+    if (linea) procesarLinea(linea);
+  }
+  if (rxBuf.length > 200) rxBuf = "";
+}
+
+function procesarLinea(l) {
+  ultimoRx = Date.now();
+  let m;
+  if ((m = /^D(\d+)$/.exec(l))) {
+    $("sDist").textContent = m[1] + " cm";
+    $("sDist").className = "big " + (+m[1] < 25 ? "bad-t" : "");
+    if (!$("verD").checked) return;
+  } else if (/^Q\d,\d+,\d+$/.test(l)) {
+    codigoNuevo = true;
+    if (esperaQ) esperaQ();
+  }
+  const cls = l === "Z" ? "sys" : (l === "O" || l === "X" || l.endsWith("?")) ? "err" : "rx";
+  let nota = "";
+  if (l === "Z") nota = "   (ruta completa)";
+  else if (l === "O") nota = "   (se detuvo: obstáculo al frente)";
+  else if (l === "X") nota = "   (cancelada)";
+  log("← " + l + nota, cls);
+}
+
+function refrescar() {
+  const el = $("sRx");
+  if (!conectado) { el.textContent = "Ninguno todavía"; el.className = ""; }
+  else if (!ultimoRx) { el.textContent = "Nada recibido"; el.className = "warn-t"; }
+  else {
+    const s = Math.round((Date.now() - ultimoRx) / 1000);
+    el.textContent = s < 3 ? "Llegando ahora" : "hace " + s + " s";
+    el.className = s < 3 ? "ok-t" : "warn-t";
+  }
+  const c = $("sCodigo");
+  if (codigoNuevo === true) { c.textContent = "Sí (respondió Q)"; c.className = "ok-t"; }
+  else if (codigoNuevo === false) { c.textContent = "No respondió"; c.className = "bad-t"; }
+  else { c.textContent = "Sin probar"; c.className = ""; }
+}
+setInterval(refrescar, 1000);
+
+// ---------- envío (cola, trozos de 20 bytes) ----------
+function enviar(txt, opciones) {
+  const soltable = opciones && opciones.soltable;
+  if (!conectado || !writeCh) { log("No hay conexión: no se envió «" + txt + "»", "err"); return Promise.resolve(false); }
+  if (soltable && pendientes > 2) return Promise.resolve(false);
+  pendientes++;
+  cola = cola.then(async () => {
+    try {
+      const data = new TextEncoder().encode(txt + "\n");
+      for (let i = 0; i < data.length; i += 20) {
+        const trozo = data.slice(i, i + 20);
+        if (writeCh.properties.writeWithoutResponse) await writeCh.writeValueWithoutResponse(trozo);
+        else await writeCh.writeValue(trozo);
+        await sleep(15);
+      }
+      if (!(opciones && opciones.silencioso)) log("→ " + txt, "tx");
+    } catch (e) {
+      log("Error al enviar: " + (e && e.message ? e.message : e), "err");
+    } finally { pendientes--; }
+  });
+  return cola.then(() => true);
+}
+
+// ---------- diagnóstico ----------
+async function probarComunicacion() {
+  const v = $("veredicto");
+  v.hidden = false;
+  v.textContent = "Probando…";
+  const rxAntes = ultimoRx;
+  codigoNuevo = null; refrescar();
+  const respondio = new Promise((res) => { esperaQ = () => res(true); setTimeout(() => res(false), 2500); });
+  await enviar("Q");
+  const ok = await respondio;
+  esperaQ = null;
+  const llegaron = ultimoRx > rxAntes || (Date.now() - ultimoRx) < 2500;
+  if (ok) {
+    v.textContent = "Todo bien: el carro responde y tiene el código nuevo (carro_monedas.ino). Si no se mueve, el problema es de motores o de alimentación: usa el programa diagnostico_carro.ino.";
+    codigoNuevo = true;
+  } else if (llegaron) {
+    codigoNuevo = false;
+    v.textContent = "Llegan datos del carro (la distancia), pero no contestó a Q. Lo más probable es que todavía tenga el código viejo (carro_guia): sube carro_monedas.ino con el módulo JDY-16 desconectado. También puede ser que no esté llegando el salto de línea.";
+  } else {
+    codigoNuevo = false;
+    v.textContent = "Estás conectado pero el carro no envía nada. Revisa: (1) que el carro esté encendido con el botón ON y las baterías cargadas; (2) que el JDY-16 esté bien enchufado en el conector Bluetooth del shield; (3) la velocidad del módulo: prueba BAUDIOS 115200 en el código; (4) que el Arduino tenga un programa cargado.";
+  }
+  refrescar();
+}
+
+// ---------- control manual ----------
+let manual = null, manualTimer = null;
+function detenerManual() {
+  if (manualTimer) { clearInterval(manualTimer); manualTimer = null; }
+  document.querySelectorAll("#pad .hold").forEach((b) => b.classList.remove("hold"));
+  if (manual) { manual = null; enviar("S", { silencioso: true }); }
+}
+function empezarManual(btn, signos) {
+  if (!conectado) { log("Conecta primero el carro.", "err"); return; }
+  const v = +$("vel").value;
+  const izq = signos[0] * v, der = signos[1] * v;
+  const orden = "M" + izq + "," + der;
+  detenerManual();
+  manual = orden;
+  btn.classList.add("hold");
+  enviar(orden, { silencioso: true, soltable: true });
+  manualTimer = setInterval(() => enviar(orden, { silencioso: true, soltable: true }), 250);
+}
+document.querySelectorAll("#pad button[data-m]").forEach((btn) => {
+  const signos = btn.dataset.m.split(",").map(Number);
+  btn.addEventListener("pointerdown", (e) => { e.preventDefault(); btn.setPointerCapture(e.pointerId); empezarManual(btn, signos); });
+  ["pointerup", "pointercancel", "lostpointercapture"].forEach((ev) => btn.addEventListener(ev, detenerManual));
+  btn.addEventListener("contextmenu", (e) => e.preventDefault());
+});
+$("btnParar").addEventListener("click", () => { detenerManual(); enviar("S"); });
+$("vel").addEventListener("input", () => { $("velTxt").textContent = $("vel").value; guardar(); });
+
+const TECLAS = { ArrowUp: "u", ArrowLeft: "l", ArrowRight: "r", ArrowDown: "d" };
+let teclaActiva = null;
+document.addEventListener("keydown", (e) => {
+  if (/INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName || "")) return;
+  if (e.code === "Space") { e.preventDefault(); detenerManual(); enviar("S"); return; }
+  const k = TECLAS[e.key];
+  if (!k || teclaActiva === e.key) return;
+  e.preventDefault();
+  teclaActiva = e.key;
+  const btn = document.querySelector("#pad ." + k);
+  empezarManual(btn, btn.dataset.m.split(",").map(Number));
+});
+document.addEventListener("keyup", (e) => { if (e.key === teclaActiva) { teclaActiva = null; detenerManual(); } });
+
+// ---------- rutas ----------
+function leerRuta() {
+  // acepta tambien el formato de pista_ordenes.txt (lineas C, A..., E): quita C/E y la A inicial de cada linea
+  const limpio = $("ruta").value.split(/\r?\n/).map(l => l.replace(/\s+/g, "").toUpperCase())
+    .filter(l => l && l !== "C" && l !== "E").map(l => l.replace(/^A/, "").replace(/^,+|,+$/g, "")).join(",");
+  if (!limpio) return { error: "La ruta está vacía." };
+  if (!/^[FBLRS]\d+(,[FBLRS]\d+)*$/.test(limpio)) return { error: "Formato no válido. Ejemplo: F1000,L450,F1000" };
+  const tramos = limpio.split(",");
+  if (tramos.length > MAX_TRAMOS) return { error: "Tiene " + tramos.length + " tramos y el carro admite " + MAX_TRAMOS + "." };
+  return { tramos };
+}
+function partirRuta(tramos) {
+  const lineas = []; let actual = "";
+  for (const t of tramos) {
+    if (actual && ("A" + actual + "," + t).length > PEDAZO_MAX) { lineas.push("A" + actual); actual = ""; }
+    actual += (actual ? "," : "") + t;
+  }
+  if (actual) lineas.push("A" + actual);
+  return ["C"].concat(lineas, ["E"]);
+}
+function actualizarInfoRuta() {
+  const r = leerRuta();
+  if (r.error) { $("rutaInfo").textContent = r.error; $("rutaInfo").className = "hint bad-t"; return; }
+  const ms = r.tramos.reduce((a, t) => a + (+t.slice(1)), 0);
+  $("rutaInfo").className = "hint";
+  $("rutaInfo").textContent = r.tramos.length + " tramos · unos " + (ms / 1000).toFixed(1) + " s";
+}
+$("ruta").addEventListener("input", () => { actualizarInfoRuta(); guardar(); });
+$("btnRuta").addEventListener("click", async () => {
+  const r = leerRuta();
+  if (r.error) { log(r.error, "err"); return; }
+  detenerManual();
+  for (const linea of partirRuta(r.tramos)) { await enviar(linea); await sleep(120); }
+});
+$("btnX").addEventListener("click", () => { detenerManual(); enviar("X"); });
+
+document.querySelectorAll("[data-t]").forEach((b) => b.addEventListener("click", () => {
+  const ms = Math.max(50, Math.min(60000, Math.round(+$("msPrueba").value || 0)));
+  enviar("R" + b.dataset.t + ms);
+}));
+function calcVel() {
+  const mm = +$("mmMedidos").value, ms = +$("msPrueba").value;
+  $("vMedida").textContent = (mm > 0 && ms > 0) ? (mm / (ms / 1000)).toFixed(0) + " mm/s" : "-- mm/s";
+}
+$("mmMedidos").addEventListener("input", calcVel);
+$("msPrueba").addEventListener("input", calcVel);
+
+// ---------- ajustes ----------
+$("btnAjustes").addEventListener("click", async () => {
+  for (const [pref, id] of [["U", "aU"], ["W", "aW"], ["G", "aG"], ["N", "aN"]]) {
+    await enviar(pref + Math.round(+$(id).value)); await sleep(80);
+  }
+});
+$("btnK").addEventListener("click", () => enviar("K" + Math.round(+$("kI").value) + "," + Math.round(+$("kD").value)));
+document.querySelectorAll("[data-cmd]").forEach((b) => b.addEventListener("click", () => enviar(b.dataset.cmd)));
+$("btnRaw").addEventListener("click", () => { const t = $("raw").value.trim(); if (t) { enviar(t); $("raw").value = ""; } });
+$("raw").addEventListener("keydown", (e) => { if (e.key === "Enter") $("btnRaw").click(); });
+
+// ---------- general ----------
+$("btnConectar").addEventListener("click", () => { if (conectado && device) { device.gatt.disconnect(); } else conectar(); });
+$("btnProbar").addEventListener("click", probarComunicacion);
+$("btnLimpiar").addEventListener("click", () => { $("log").textContent = ""; });
+window.addEventListener("blur", detenerManual);
+document.addEventListener("visibilitychange", () => { if (document.hidden) detenerManual(); });
+
+function guardar() {
+  try { localStorage.setItem("panelCarro", JSON.stringify({ ruta: $("ruta").value, vel: $("vel").value })); } catch (e) {}
+}
+function cargar() {
+  try {
+    const d = JSON.parse(localStorage.getItem("panelCarro") || "null");
+    if (d) { if (d.ruta) $("ruta").value = d.ruta; if (d.vel) { $("vel").value = d.vel; $("velTxt").textContent = d.vel; } }
+  } catch (e) {}
+}
+cargar(); actualizarInfoRuta(); habilitar(false); refrescar();
+if (!navigator.bluetooth) log("Este navegador no tiene Web Bluetooth. Abre este archivo con Chrome (Android o computador).", "err");
+else log("Listo. Pulsa «Conectar» y elige el JDY-16.", "sys");
+</script>
+</body>
+</html>
