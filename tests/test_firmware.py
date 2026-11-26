@@ -42,3 +42,10 @@ def test_el_firmware_de_la_estacion_acepta_los_comandos_que_envia_el_programa():
 def test_los_ino_estan_en_carpeta_con_su_mismo_nombre():
     for ino in (RAIZ / "firmware").rglob("*.ino"):
         assert ino.parent.name == ino.stem, f"{ino}: la carpeta debe llamarse igual que el .ino (Arduino IDE)"
+
+
+def test_el_factor_de_ruedas_por_defecto_no_hace_girar_en_circulos():
+    """Con 100,50 por defecto el carro daba vueltas en circulo: el defecto debe ser simetrico."""
+    izq = int(re.search(r"FACTOR_IZQ_INICIAL\s*=\s*(\d+);", CARRO).group(1))
+    der = int(re.search(r"FACTOR_DER_INICIAL\s*=\s*(\d+);", CARRO).group(1))
+    assert izq == der == 100

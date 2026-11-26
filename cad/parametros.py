@@ -5,7 +5,7 @@ Origen del sistema de coordenadas de la escena:
     X = hacia donde sale la moneda de la banda (extremo de salida de la banda = X 0)
     Y = lateral,  Z = hacia arriba desde la mesa.
 
-MEDIDO por Kevin:   banda (160 de ancho, 80 de alto), pista (ver monedas/pista.py), termo Ø90.
+MEDIDO en el montaje físico: banda (160 de ancho, 80 de alto), pista (ver monedas/pista.py), termo Ø90.
 SUPUESTO (verificar con pie de rey ANTES de imprimir): todo lo marcado con [?].
 """
 import math

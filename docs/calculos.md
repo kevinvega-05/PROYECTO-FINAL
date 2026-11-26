@@ -1,7 +1,7 @@
 # Cálculos de ingeniería
 
 Todo se recalcula con `python -m monedas.calculos` (acepta tus mediciones: `--bateria-mah 2600 --motor-ma 300 ...`).
-Los **supuestos** están en la clase `Supuestos` de `monedas/calculos.py`; los que Kevin no ha medido se marcan **(supuesto)**
+Los **supuestos** están en la clase `Supuestos` de `monedas/calculos.py`; los que no se han medido se marcan **(supuesto)**
 y deben cambiarse por lo que mida con el multímetro. Valores "típicos" = hojas de datos genéricas.
 
 ## Supuestos principales

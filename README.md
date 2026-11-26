@@ -4,7 +4,7 @@
 
 **Una banda, una cámara, un servo, cinco vasos y un carro que los lleva a la meta.**
 
-Proyecto de curso · Ingeniería Mecatrónica · Universidad Militar Nueva Granada (UMNG) · Kevin
+Proyecto de curso · Ingeniería Mecatrónica · Universidad Militar Nueva Granada (UMNG)
 
 [![CI](https://github.com/kevinvega-05/PROYECTO-FINAL/actions/workflows/ci.yml/badge.svg)](https://github.com/kevinvega-05/PROYECTO-FINAL/actions)
 ![Python](https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white)
@@ -36,12 +36,12 @@ Proyecto de curso · Ingeniería Mecatrónica · Universidad Militar Nueva Grana
 
 ## Lo que ya existe en la vida real
 
-Esto **no es solo simulación**: son las fotos y pruebas del montaje físico de Kevin.
+Esto **no es solo simulación**: son las fotos y pruebas del montaje físico del equipo.
 
 <table>
 <tr>
 <td width="50%"><img src="docs/img/fisico/pista_con_carro.jpg" alt="Pista real con el carro"><br><sub><b>La pista real</b>, tres tramos rectos de 22 cm de carril, dos retornos en U y el carro en la salida.</sub></td>
-<td width="50%"><img src="docs/img/fisico/pista_croquis.jpg" alt="Croquis con medidas"><br><sub><b>El croquis con medidas</b> (91 / 66 / 93 cm) de donde sale la geometría de <code>monedas/pista.py</code>.</sub></td>
+<td width="50%"><img src="docs/img/fisico/pista_vista_superior.jpg" alt="Pista real vista desde arriba"><br><sub><b>Vista desde arriba:</b> tramos de 91 / 66 / 93 cm de donde sale la geometría de <code>monedas/pista.py</code>.</sub></td>
 </tr>
 <tr>
 <td><img src="docs/img/fisico/carro_vista_superior.jpg" alt="Carro visto desde arriba"><br><sub><b>El carro</b>: chasis 2WD, Arduino UNO + shield, módulo Bluetooth y dos celdas 18650 (ver <a href="docs/calculos.md">autonomía</a>).</sub></td>
@@ -109,16 +109,145 @@ sequenceDiagram
     B-->>U: «llegó a la meta» (con voz opcional)
 ```
 
-## Cuatro etapas, tres niveles
+## Las cuatro etapas: mecánico, eléctrico y software
 
-El análisis completo está en **[docs/analisis_por_etapas.md](docs/analisis_por_etapas.md)**; aquí el resumen:
+Resumen aquí; el detalle completo está en **[análisis por etapas](docs/analisis_por_etapas.md)**, **[diseño eléctrico](docs/electrico.md)** y **[código por etapas](docs/software.md)**.
 
-| Etapa | Mecánico | Eléctrico | Software | Papel del ESP32 |
-|---|---|---|---|---|
-| **1 · Conteo** | Poste y bandeja del celular, embudo de una moneda por vez, fondo mate | Sensor LM393 → GPIO34 | Hough + diámetro + color → 9 clases | Entrega el evento de presencia |
-| **2 · Transporte** | Banda de 660 mm a 20 mm/s | L298N, PWM, GND común | Rampa de PWM sin bloquear | PWM por hardware (LEDC 1 kHz) |
-| **3 · Embalaje** | Canaleta 14° + 5 vasos en arco (20/45/90/135/160°) | Servo SG90 (hasta 650 mA), cargador 5 V | `C <k>` justo a tiempo | Servo a 50 Hz / 14 bits sin interferir la banda |
-| **4 · Meta** | Carro remolca el vaso por la oreja | Arduino UNO + BLE, 2×18650 | Ruta `F/B/L/R/S` + chatbot + tablero | *(el carro usa UNO: migrarlo es la mejora principal)* |
+### Etapa 1 · Conteo e identificación
+
+* 🔩 **Mecánico:** poste y bandeja del celular mirando hacia abajo, embudo que deja pasar una moneda por vez y fondo liso y mate sobre la banda.
+* ⚡ **Eléctrico:** el sensor de presencia LM393 entra por **GPIO34** (solo entrada, activo en bajo); el celular se alimenta aparte y manda el video por WiFi.
+* 💻 **Software:** `vision.py` resta el fondo, detecta círculos (Hough), calcula el diámetro en mm y la fracción dorada y clasifica en 9 clases; `estado.py` cuenta, pesa y suma el valor.
+
+```mermaid
+flowchart LR
+    A["frame"] --> B["restar fondo"] --> C["círculos (Hough)"] --> D["Ø en mm + color"] --> E["clasificar (9 clases)"] --> F["¿cruzó la línea?"] --> G["planificador"]
+```
+
+<details><summary>Ver el código de la clasificación</summary>
+
+```python
+for v, ref in refs.items():
+    err_tam = abs(d - ref["d"]) / ref["d"]
+    if err_tam > TOL_TAMANO:
+        continue
+    err_color = abs(oro - ref["oro"])
+    puntaje = err_tam / TOL_TAMANO + PESO_COLOR * err_color
+    if puntaje < mejor_puntaje:
+        mejor, mejor_puntaje = v, puntaje
+```
+</details>
+
+### Etapa 2 · Transporte (banda)
+
+* 🔩 **Mecánico:** banda modular de 660 mm a 20 mm/s: 33 s de recorrido y 15 s de la línea de lectura al borde.
+* ⚡ **Eléctrico:** ESP32 → **L298N** (`ENA` GPIO18 con PWM de 1 kHz, `IN1` GPIO19, `IN2` GPIO21) → motorreductor TT. El L298N cae ≈ 2 V, por eso `PWM_MIN = 90`.
+* 💻 **Software:** el ESP32 sube y baja el PWM en **rampa** sin `delay`; el PC solo manda `B <0-100>`.
+
+```mermaid
+flowchart LR
+    ESP["ESP32"] -- "GPIO18 PWM" --> ENA["L298N ENA"]
+    ESP -- "GPIO19 / 21" --> IN["IN1 / IN2"]
+    L["L298N"] --> M["Motor TT"]
+```
+
+<details><summary>Ver el código de la rampa de la banda</summary>
+
+```cpp
+void actualizarBanda() {
+  if (dutyBanda == dutyObjetivo || millis() - tRampa < PASO_RAMPA_MS) return;
+  tRampa = millis();
+  dutyBanda += (dutyObjetivo > dutyBanda) ? 1 : -1;
+  escribirBanda(dutyBanda);
+}
+```
+</details>
+
+### Etapa 3 · Embalaje (canaleta con servo)
+
+* 🔩 **Mecánico:** tolva giratoria y canal con **14°** de pendiente, 5 vasos Ø42×45 en un arco de R = 110 mm (ángulos 20/45/90/135/160°). Cada vaso guarda la moneda **actual y la antigua** de su valor.
+* ⚡ **Eléctrico:** servo SG90 en **GPIO23** (50 Hz, 14 bits), +5 V del cargador (no del USB), GND común y un condensador de 470–1000 µF; hasta 650 mA al bloquearse.
+* 💻 **Software:** `Planificador` gira la canaleta justo antes de que llegue la moneda (`C <k>`) y manda las no reconocidas al ángulo de rechazo.
+
+```mermaid
+flowchart LR
+    ESP["ESP32"] -- "GPIO23 PWM 50 Hz" --> S["SG90"]
+    C["Cargador 5 V"] --> S
+    S --> K["canaleta → vaso k"]
+```
+
+<details><summary>Ver el código del servo y del planificador</summary>
+
+```cpp
+void escribirServo(int grados) {
+  grados = constrain(grados, 0, 180);
+  long pulso_us = 500L + (long)grados * (2400L - 500L) / 180L;   // SG90: 0.5-2.4 ms
+  int duty = (int)(pulso_us * 16383L / 20000L);
+  ledcWrite(PIN_SERVO, duty);
+}
+```
+
+```python
+k = cfg.cubiculo_de_valor(mc.valor_de(clave))
+self._esperar_hasta(llegada - cfg.TIEMPO_SERVO_S)
+if k is None:
+    self.estacion.angulo(cfg.ANGULO_RECHAZO)
+else:
+    self.estacion.cubiculo(k)
+self._esperar_hasta(max(llegada, time.time()) + cfg.TIEMPO_CAIDA_S)
+self.estado.moneda_llego(clave, k)
+```
+</details>
+
+### Etapa 4 · Recolección y llegada a la meta
+
+* 🔩 **Mecánico:** el carro (170 × 240 mm) retrocede, engancha la **oreja** del vaso con un pasador Ø5,4 y lo remolca ≈ 0,9 N por 3 tramos rectos, 2 retornos en U y 3 termos.
+* ⚡ **Eléctrico:** Arduino UNO + shield LAFVIN (motores en D2/D5 y D4/D6), sensor de distancia (D12/D13), servo del sensor (D10), módulo BLE JDY-16 en D0/D1 a 9600 baudios y 2 celdas 18650.
+* 💻 **Software:** `pista.py` genera la ruta (`F/B/L/R/S` + ms), `CarroBLE` la envía en trozos de 20 bytes, el firmware la ejecuta y el `Despachador` marca el vaso como despachado cuando llega a la meta.
+
+```mermaid
+flowchart LR
+    UNO["Arduino UNO + shield"] -- "D2/D5 · D4/D6" --> M["2 motores TT"]
+    UNO -- "D12 / D13" --> US["sensor de distancia"]
+    BLE["JDY-16"] <-- "D0/D1 · 9600" --> UNO
+    BAT["2×18650"] --> UNO
+```
+
+<details><summary>Ver el código de la ruta y del carro</summary>
+
+```python
+def avance(mm):
+    ms = ms_dist(mm)
+    toks = []
+    for _ in range(ms // PASO_RECTO_MS):
+        toks += [("F", PASO_RECTO_MS), ("L", CORRECCION_IZQ_MS)]   # 1 s adelante + rectificar
+    ...
+```
+
+```cpp
+void aplicarTramo(byte i) {
+  switch (ruta[i].c) {
+    case 'F': velIzq = velAdelante;  velDer = velAdelante;  break;
+    case 'B': velIzq = -velReversa;  velDer = -velReversa;  break;
+    case 'L': velIzq = -velGiro;     velDer = velGiro;      break;
+    case 'R': velIzq = velGiro;      velDer = -velGiro;     break;
+    default:  velIzq = 0;            velDer = 0;
+  }
+  finTramo = millis() + ruta[i].ms;
+}
+```
+</details>
+
+### ⚡ Mapa de pines
+
+| Placa | Pin | Función |
+|---|---|---|
+| ESP32 | GPIO18 / 19 / 21 | `ENA` (PWM) / `IN1` / `IN2` del L298N (banda) |
+| ESP32 | GPIO23 | Servo SG90 de la canaleta |
+| ESP32 | GPIO34 | Sensor de presencia (solo entrada) |
+| Arduino UNO | D2 / D5 · D4 / D6 | Motor izquierdo (dir/PWM) · motor derecho (dir/PWM) |
+| Arduino UNO | D12 / D13 · D10 | TRIG / ECHO del sensor de distancia · servo del sensor |
+| Arduino UNO | D0 / D1 | JDY-16 (BLE, 9600 baudios) |
 
 ### ⚡ Por qué el ESP32
 
@@ -129,7 +258,7 @@ El análisis completo está en **[docs/analisis_por_etapas.md](docs/analisis_por
 | PWM | LEDC: frecuencia y resolución por canal | 6 canales de 8 bits, timers compartidos |
 | Radio | WiFi + BLE integrados | ninguna (módulo JDY-16 externo) |
 
-En la estación hay que mover una banda **suave** (1 kHz) y un servo **preciso** (50 Hz, 14 bits) *a la vez*, leer un sensor y atender el PC: el ESP32 lo hace con dos canales LEDC y un bucle cooperativo sin `delay`.
+En la estación hay que mover una banda **suave** (1 kHz) y un servo **preciso** (50 Hz, 14 bits) *a la vez*, leer un sensor y atender el PC: el ESP32 lo hace con dos canales LEDC y un bucle cooperativo sin `delay`. Migrar también el carro a ESP32 es la mejora más valiosa pendiente.
 
 ## Números clave
 
@@ -179,12 +308,12 @@ Todas pasan una validación automática de malla (herméticas, caben en 220 mm, 
 
 <table>
 <tr>
-<td width="50%"><img src="docs/img/fisico/pista_vista_superior.jpg" alt="Pista real"><br><sub>La pista real.</sub></td>
+<td width="50%"><img src="docs/img/fisico/pista_vista_superior.jpg" alt="Pista real"><br><sub>La pista real, con sus tres tramos rectos y dos retornos en U.</sub></td>
 <td width="50%"><img src="docs/img/pista_plano.png" alt="Plano generado"><br><sub>Plano y trayectoria generados por <code>python -m monedas.pista</code>.</sub></td>
 </tr>
 </table>
 
-`monedas/pista.py` convierte las medidas del croquis en órdenes `F/B/L/R/S` + milisegundos: **avance controlado** (1 s adelante y una corrección a la izquierda, porque el carro se desvía a la derecha),
+`monedas/pista.py` convierte las medidas de la pista real en órdenes `F/B/L/R/S` + milisegundos: **avance controlado** (1 s adelante y una corrección a la izquierda, porque el carro se desvía a la derecha),
 **retornos en U** por pasos de 30° y **esquives** de los 3 termos Stanley de 900 ml (Ø90 mm). Detalle en [docs/pista.md](docs/pista.md).
 
 ## Estado real
@@ -246,7 +375,7 @@ Más en [docs/problemas.md](docs/problemas.md).
 | `cad/` | `parametros.py` + `generar_cad.py` → `stl/`, `referencia/`, `escena.glb`, `PIEZAS.md` |
 | `visor3d/` | Fuente del visor three.js y `construir.py` → `docs/visor3d.html` |
 | `herramientas/` | `panel_carro.html` (Web Bluetooth para mover el carro) |
-| `docs/` | Análisis, cálculos, guías, diagramas, fotos y capturas |
+| `docs/` | `analisis_por_etapas`, `electrico`, `software`, `calculos`, guías, fotos y capturas |
 | `tests/` | 81 pruebas: software, protocolo, firmware↔software, CAD, cálculos |
 | `legacy/` | Versión anterior (carrusel de 9 cubículos y PyBullet), como referencia |
 
@@ -264,6 +393,6 @@ ESP32 · L298N · motorreductor TT de la banda · servo SG90 · sensor IR LM393 
 
 ## Créditos y licencia
 
-Proyecto de Kevin (UMNG, Ingeniería Mecatrónica). Punto de partida: repositorio del docente [dialejobv/U_Militar](https://github.com/dialejobv/U_Militar).
+Proyecto de curso de Ingeniería Mecatrónica (UMNG). Punto de partida: repositorio del docente [dialejobv/U_Militar](https://github.com/dialejobv/U_Militar).
 La imagen del enunciado está en [`docs/img/fisico/concepto_enunciado.jpg`](docs/img/fisico/concepto_enunciado.jpg).
 Código y piezas bajo licencia **MIT** ([LICENSE](LICENSE)).
