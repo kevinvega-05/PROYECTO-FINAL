@@ -4,7 +4,7 @@
 
 **Una banda, una cámara, un servo, cinco vasos y un carro que los lleva a la meta.**
 
-Proyecto de curso · Ingeniería Mecatrónica · Universidad Militar Nueva Granada (UMNG)
+Universidad Militar Nueva Granada
 
 [![CI](https://github.com/kevinvega-05/PROYECTO-FINAL/actions/workflows/ci.yml/badge.svg)](https://github.com/kevinvega-05/PROYECTO-FINAL/actions)
 ![Python](https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white)
@@ -412,14 +412,3 @@ make cad && make visor      # regenerar piezas y visor 3D
 ```
 
 CI (`.github/workflows/ci.yml`): pruebas, ruff, demo sin ventana, generación del CAD y del visor.
-
-## Materiales (estimados)
-
-ESP32 · L298N · motorreductor TT de la banda · servo SG90 · sensor IR LM393 · Arduino UNO + shield LAFVIN 2WD · módulo BLE JDY-16 ·
-2 celdas 18650 · celular con IP Webcam · cartulina mate · filamento PLA/PETG · 3 termos Stanley de 900 ml (obstáculos) · cargador de 5 V / 2 A.
-
-## Créditos y licencia
-
-Proyecto de curso de Ingeniería Mecatrónica (UMNG). Punto de partida: repositorio del docente [dialejobv/U_Militar](https://github.com/dialejobv/U_Militar).
-La imagen del enunciado está en [`docs/img/fisico/concepto_enunciado.jpg`](docs/img/fisico/concepto_enunciado.jpg).
-Código y piezas bajo licencia **MIT** ([LICENSE](LICENSE)).
