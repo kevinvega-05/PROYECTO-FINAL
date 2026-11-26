@@ -526,7 +526,7 @@ La banda era la pieza **más crítica** (sin ella no hay flujo continuo de moned
 3. Poner un **motorreductor con más par** o reducir la fricción de la banda; dejar un **motor de repuesto**.
 4. Alimentar el motor de una fuente **independiente** del ESP32 (con tierra común) para que sus picos no reinicien ni ensucien la lectura del sensor.
 
-### 4 · Otras cosas que quedaron abiertas
+### 4 · Cosas pendientes
 
 | Pendiente | Impacto |
 |---|---|
@@ -545,6 +545,3 @@ La banda era la pieza **más crítica** (sin ella no hay flujo continuo de moned
 4. Imprimir el CAD, verificar las medidas `[?]` y corregir `parametros.py`.
 5. Aviso de vaso lleno y migración del carro a ESP32.
 
-### Lo que sí se logró
-
-Aunque la integración final no salió, quedó: un **software completo y probado** (84 pruebas), una **visión calibrada**, **firmware coherente con el protocolo**, un **gemelo digital** con las piezas listas para imprimir, **cálculos de ingeniería** y un repositorio que documenta con claridad *qué funciona, qué no y por qué*. Eso último también es resultado: sabemos exactamente **dónde está el siguiente paso**.
