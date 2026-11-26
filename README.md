@@ -313,7 +313,7 @@ con el carro recorriendo **la misma ruta** que se envía por Bluetooth, la canal
 </tr>
 </table>
 
-### Plano del selector (la geometría que manda sobre todo lo demás)
+### Plano del selector
 
 <table>
 <tr>
@@ -329,7 +329,7 @@ con el carro recorriendo **la misma ruta** que se envía por Bluetooth, la canal
   los vasos (48 mm). Esa caída de 24 mm en 96 mm da **14°**: es el punto débil del diseño (una moneda sobre plástico suele pedir 17–22°),
   por eso la moneda depende del impulso de la banda y conviene un canal liso. El validador de `generar_cad.py` lo avisa si baja de 18°.
 
-### Catálogo de piezas imprimibles (cada imagen es un STL real)
+### Catálogo de piezas imprimibles
 
 > Versión interactiva para girar y medir cada pieza: [`docs/piezas3d.html`](docs/piezas3d.html) (se abre en el navegador, sin instalar nada).
 
