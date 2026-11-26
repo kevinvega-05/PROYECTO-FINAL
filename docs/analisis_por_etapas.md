@@ -79,7 +79,7 @@ que elegir entre banda suave o servo preciso.
 
 ## Etapa 4 · Recolección y direccionamiento a la meta
 
-**Mecánico.** El carro (170 × 240 mm) retrocede, engancha la **oreja** del vaso con un pasador Ø5,4 y lo remolca. La
+**Mecánico.** (Estructura y placa Arduino en [carro.md](carro.md).) El carro (170 × 240 mm) retrocede, engancha la **oreja** del vaso con un pasador Ø5,4 y lo remolca. La
 fuerza de arrastre es mínima: vaso + monedas ≈ 0,23 kg con μ ≈ 0,4 → ≈ 0,9 N **(estimado)**. La pista tiene
 3 tramos rectos (91/66/93 cm), 2 retornos en U de Ø32 cm y 3 termos Ø90 mm; el recorrido plan mide ≈ 3,5 m en
 ≈ 17,8 s (≈ 200 mm/s) con `V_AVANCE = 250` y `T_GIRO90 = 450` **provisionales**. El carro tiende a irse a la

@@ -44,8 +44,8 @@ Esto **no es solo simulación**: son las fotos y pruebas del montaje físico del
 <td width="50%"><img src="docs/img/fisico/pista_vista_superior.jpg" alt="Pista real vista desde arriba"><br><sub><b>Vista desde arriba:</b> tramos de 91 / 66 / 93 cm de donde sale la geometría de <code>monedas/pista.py</code>.</sub></td>
 </tr>
 <tr>
-<td><img src="docs/img/fisico/carro_vista_superior.jpg" alt="Carro visto desde arriba"><br><sub><b>El carro</b>: chasis 2WD, Arduino UNO + shield, módulo Bluetooth y dos celdas 18650 (ver <a href="docs/calculos.md">autonomía</a>).</sub></td>
-<td><img src="docs/img/banda_fisica.png" alt="Banda transportadora"><br><sub><b>La banda</b> modular de 3 módulos (22 cm c/u, 16 cm de ancho, 8 cm de alto) ya armada.</sub></td>
+<td><img src="docs/img/fisico/carro_lateral.jpg" alt="Carro"><br><sub><b>El carro</b>: chasis 2WD de acrílico, Arduino UNO + shield, módulo Bluetooth, sensor de distancia y dos celdas 18650 (<a href="docs/carro.md">estructura y placa Arduino</a>).</sub></td>
+<td><img src="docs/img/fisico/banda_roja.jpg" alt="Banda transportadora"><br><sub><b>La banda</b>: placas rojas, cadena modular negra, motorreductor TT amarillo y patas (22 cm por módulo, 16 cm de ancho, 8 cm de alto).</sub></td>
 </tr>
 <tr>
 <td colspan="2" align="center"><img src="docs/img/fisico/carro_en_pista.gif" alt="El carro andando en la pista" width="240"><br><sub><b>El carro en la pista</b> (video del 23-nov) probando el avance controlado. Esa prueba mostró que se desvía, y de ahí salió el factor de ruedas <code>K</code> y la corrección <code>L40</code>.</sub></td>
@@ -238,6 +238,33 @@ void aplicarTramo(byte i) {
 ```
 </details>
 
+### 🚗 El carro y su placa Arduino
+
+<table>
+<tr>
+<td width="55%"><img src="docs/img/fisico/carro_anotado.jpg" alt="Carro con partes numeradas"></td>
+<td>
+
+| N.º | Parte |
+|---|---|
+| 1 | Portapilas, 2×18650 |
+| 2 | **Arduino UNO + shield LAFVIN** |
+| 3 | Módulo BLE JDY-16 |
+| 4 | Sensor de distancia |
+| 5 | Servo SG90 del sensor |
+| 6 | Motorreductor TT + rueda |
+| 7 | Chasis acrílico de 2 niveles |
+| 8 | Separadores de latón |
+
+</td>
+</tr>
+</table>
+
+* **Estructura:** tracción diferencial con rueda loca; baterías atrás y electrónica al centro dejan el peso sobre el eje motriz, que es lo que da tracción para remolcar el vaso.
+* **Por qué un Arduino UNO:** alcanza para leer órdenes, ejecutar tramos con `millis()` y medir distancia, y su shield trae el puente H. Sus límites son reales: **2 kB de SRAM** (la ruta de 120 tramos ocupa ≈ 440 B), **una sola UART** compartida entre USB y BLE (hay que retirar el JDY-16 para subir código) y sin radio propia.
+* **Deriva:** con motores TT las ruedas no giran igual; se compensa con el factor `K` guardado en EEPROM y la corrección de la ruta.
+* Detalle, tabla de recursos del microcontrolador y plan de migración a ESP32 en **[docs/carro.md](docs/carro.md)**.
+
 ### ⚡ Mapa de pines
 
 | Placa | Pin | Función |
@@ -375,7 +402,7 @@ Más en [docs/problemas.md](docs/problemas.md).
 | `cad/` | `parametros.py` + `generar_cad.py` → `stl/`, `referencia/`, `escena.glb`, `PIEZAS.md` |
 | `visor3d/` | Fuente del visor three.js y `construir.py` → `docs/visor3d.html` |
 | `herramientas/` | `panel_carro.html` (Web Bluetooth para mover el carro) |
-| `docs/` | `analisis_por_etapas`, `electrico`, `software`, `calculos`, guías, fotos y capturas |
+| `docs/` | `analisis_por_etapas`, `electrico`, `software`, `carro`, `calculos`, guías, fotos y capturas |
 | `tests/` | 82 pruebas: software, protocolo, firmware↔software, CAD, cálculos |
 | `legacy/` | Versión anterior (carrusel de 9 cubículos y PyBullet), como referencia |
 
