@@ -12,7 +12,7 @@ Universidad Militar Nueva Granada
 ![Arduino](https://img.shields.io/badge/Arduino-carro-00979D?logo=arduino&logoColor=white)
 ![OpenCV](https://img.shields.io/badge/OpenCV-visi%C3%B3n-5C3EE8?logo=opencv&logoColor=white)
 ![Streamlit](https://img.shields.io/badge/Streamlit-tablero-FF4B4B?logo=streamlit&logoColor=white)
-![Tests](https://img.shields.io/badge/pruebas-82%20OK-3ddc97)
+![Tests](https://img.shields.io/badge/pruebas-84%20OK-3ddc97)
 ![Licencia](https://img.shields.io/badge/licencia-MIT-lightgrey)
 
 <img src="docs/img/hero.png" alt="Gemelo digital 3D: estación, vasos, carro y pista a escala" width="100%">
@@ -313,15 +313,69 @@ con el carro recorriendo **la misma ruta** que se envía por Bluetooth, la canal
 </tr>
 </table>
 
-| Pieza | Cant. | Para qué |
-|---|---|---|
-| `vaso` | 5 | Ø42×45 con oreja de enganche; guarda la moneda **actual y la antigua** de su valor |
-| `placa_portavasos_A/B/C` | 3 | Arco de los 5 vasos, en 3 tramos que caben en una cama de 220 mm |
-| `torre_servo` + `canaleta` | 2 | SG90 sobre torre hueca y tolva giratoria con canal |
-| `tolva_entrada` | 1 | Embudo: una moneda por vez |
-| `soporte_sensor_ir` | 1 | Sensor de presencia sobre la banda |
-| `base_poste_celular` + `soporte_celular` | 2 | Cámara del celular mirando hacia abajo |
-| `enganche_carro` | 1 | Pasador de remolque que entra en la oreja del vaso |
+### Plano del selector (la geometría que manda sobre todo lo demás)
+
+<table>
+<tr>
+<td width="50%"><img src="docs/img/cad_planta.png" alt="Planta del selector"></td>
+<td width="50%"><img src="docs/img/cad_corte.png" alt="Corte lateral del selector"></td>
+</tr>
+</table>
+
+* **Planta (izquierda):** los 5 vasos están sobre un arco de **R = 110 mm** centrado en el pivote del servo, que queda 16 mm después del borde
+  de la banda. Cada línea naranja es la canaleta apuntando a un vaso: **20° → \$50, 45° → \$100, 90° → \$200, 135° → \$500, 160° → \$1000**,
+  exactamente los `ANGULOS` del firmware del ESP32. Por eso el servo no necesita realimentación: el ángulo *es* la dirección.
+* **Corte (derecha):** el pivote está a **78 mm** (la superficie de la banda) y la punta de la canaleta a **54 mm**, 6 mm sobre el borde de
+  los vasos (48 mm). Esa caída de 24 mm en 96 mm da **14°**: es el punto débil del diseño (una moneda sobre plástico suele pedir 17–22°),
+  por eso la moneda depende del impulso de la banda y conviene un canal liso. El validador de `generar_cad.py` lo avisa si baja de 18°.
+
+### Catálogo de piezas imprimibles (cada imagen es un STL real)
+
+> Versión interactiva para girar y medir cada pieza: [`docs/piezas3d.html`](docs/piezas3d.html) (se abre en el navegador, sin instalar nada).
+
+<table>
+<tr>
+<td width="50%"><img src="docs/img/cad/vaso.png" alt="Vaso"><br><b>Vaso ×5</b> · Ø42 × 45 mm. Pared de 3 mm y fondo de 3 mm dejan un interior de Ø36, suficiente para la moneda mayor (\$1000, 26 mm).
+Se ve la <b>oreja</b> abajo a la derecha: tiene un agujero de Ø6 que se encaja en el pasador Ø5,4 del carro. Así el carro <i>arrastra</i> el vaso, no lo empuja.
+Cada vaso guarda la moneda <i>actual</i> y la <i>antigua</i> de su valor (24 a 56 monedas).</td>
+<td width="50%"><img src="docs/img/cad/placa_portavasos_A.png" alt="Placa portavasos"><br><b>Placas del arco A/B/C</b> · 3 mm de espesor. La imagen muestra la A (vasos \$50 y \$100): un sector de corona circular con
+los <b>alojamientos abiertos hacia afuera</b> para que el vaso salga sin levantarlo, y las ranuras de la parte baja donde encajan los pasadores de filamento que unen las tres placas.
+Se parte en 3 para que cada una quepa en una cama de 220 mm.</td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/img/cad/torre_servo.png" alt="Torre del servo"><br><b>Torre del servo</b> · 68 mm de alto. Es una torre hueca con una ventana rectangular arriba por donde asoma el SG90, que
+<i>cuelga de sus orejas</i> con los 4 tornillos de las esquinas. Sube el eje hasta los 78 mm del pivote sin gastar plástico. Se imprime <b>boca abajo</b> (como en la imagen del catálogo interactivo)
+para que la placa superior quede plana sobre la cama.</td>
+<td width="50%"><img src="docs/img/cad/canaleta.png" alt="Canaleta"><br><b>Canaleta</b> · 119 × 46 mm. A la izquierda la <b>tolva giratoria</b> Ø46 (con el agujero central para el horn del servo) que recibe la moneda
+que cae de la banda; a la derecha el <b>canal</b> de 30 mm de ancho con paredes laterales que la guían hasta el vaso. Es la única pieza que se mueve: el servo la gira
+a 20/45/90/135/160°.</td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/img/cad/tolva_entrada.png" alt="Tolva de entrada"><br><b>Tolva de entrada</b> · 130 × 194 mm, 14 mm de alto. Son paredes en V que convergen sobre la banda para que las monedas lleguen
+<i>de una en una</i>; el celular las fotografía justo después, así que dos monedas pegadas romperían la clasificación.</td>
+<td width="50%"><img src="docs/img/cad/soporte_sensor_ir.png" alt="Soporte del sensor IR"><br><b>Soporte del sensor IR</b> · 115 × 32 × 118 mm. Un brazo en L que sostiene el módulo FC-51 sobre la banda (GPIO34, activo en bajo):
+cuando la moneda lo cruza, el ESP32 sabe que ya cayó a la canaleta y puede mandar el servo al siguiente vaso.</td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/img/cad/soporte_celular.png" alt="Bandeja del celular"><br><b>Bandeja del celular</b> · 96 × 216 mm. Lleva un <b>collar</b> (cilindro arriba a la derecha) que se desliza por el poste y una
+<b>ventana cuadrada</b> para la lente, de modo que la cámara mira hacia abajo a ~280 mm de la banda. Junto con la <i>base del poste</i> (130 × 130 mm) fija el encuadre; si el celular se mueve, hay que recalibrar píxeles/mm.</td>
+<td width="50%"><img src="docs/img/cad/enganche_carro.png" alt="Enganche del carro"><br><b>Enganche del carro</b> · 44 × 32 × 23 mm. Una base atornillada a la parte trasera del carro con el <b>pasador Ø5,4 mm</b> con punta cónica.
+Es el eslabón entre las dos mitades del proyecto: el pasador entra en la oreja del vaso de la imagen del vaso y el carro lo remolca por la pista.</td>
+</tr>
+</table>
+
+| Pieza | Cant. | Dimensiones (mm) | Volumen |
+|---|---|---|---|
+| `vaso` | 5 | 54 × 42 × 45 | 20,2 cm³ |
+| `placa_portavasos_A/B/C` | 3 | 124 × 115 × 3 (la B: 76 × 111 × 3) | 17,1 / 14,4 / 17,1 cm³ |
+| `torre_servo` | 1 | 51 × 47 × 68 | 29,7 cm³ |
+| `canaleta` | 1 | 119 × 46 × 15 | 14,7 cm³ |
+| `tolva_entrada` | 1 | 130 × 194 × 14 | 16,7 cm³ |
+| `soporte_sensor_ir` | 1 | 115 × 32 × 118 | 29,7 cm³ |
+| `base_poste_celular` + `soporte_celular` | 2 | 130 × 130 × 40 · 96 × 216 × 40 | 129,6 + 97,9 cm³ |
+| `enganche_carro` | 1 | 44 × 32 × 23 | 5,9 cm³ |
+
+**Material total ≈ 0,47 L** (≈ 0,59 kg si fuera macizo; con 20 % de relleno, del orden de 200–300 g). Es una estimación a partir de los volúmenes de la malla, no de un laminador.
 
 Todas pasan una validación automática de malla (herméticas, caben en 220 mm, la canaleta no choca a ningún ángulo). Medidas en [cad/PIEZAS.md](cad/PIEZAS.md).
 
@@ -347,7 +401,7 @@ Todas pasan una validación automática de malla (herméticas, caben en 220 mm, 
 
 | Parte | Estado |
 |---|---|
-| Software (visión, planificador, despacho, chatbot, tablero, ruta) | ✅ Funciona en demo/simulación; **82 pruebas pasan**. Visión calibrada en banco con la cámara del celular. |
+| Software (visión, planificador, despacho, chatbot, tablero, ruta) | ✅ Funciona en demo/simulación; **84 pruebas pasan**. Visión calibrada en banco con la cámara del celular. |
 | Firmware ESP32 y Arduino | 🟡 Consistente con el software por pruebas estáticas; **sin compilar en CI**. La estación movió banda y servo; la banda aún no arrastra bien. |
 | Piezas 3D | 🟡 Generadas y validadas en malla, **sin imprimir**. Medidas `[?]` en `cad/parametros.py` por verificar con pie de rey. |
 | Pista y carro | 🟡 Pista y carro reales; largos de tramos medidos, separación entre ejes, `V_AVANCE` y `T_GIRO90` **provisionales**. El carro aún se desvía: falta afinar `K`. |
@@ -403,7 +457,7 @@ Más en [docs/problemas.md](docs/problemas.md).
 | `visor3d/` | Fuente del visor three.js y `construir.py` → `docs/visor3d.html` |
 | `herramientas/` | `panel_carro.html` (Web Bluetooth para mover el carro) |
 | `docs/` | `analisis_por_etapas`, `electrico`, `software`, `carro`, `calculos`, guías, fotos y capturas |
-| `tests/` | 82 pruebas: software, protocolo, firmware↔software, CAD, cálculos |
+| `tests/` | 84 pruebas: software, protocolo, firmware↔software, CAD, cálculos |
 | `legacy/` | Versión anterior (carrusel de 9 cubículos y PyBullet), como referencia |
 
 ```bash

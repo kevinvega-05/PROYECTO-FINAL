@@ -13,6 +13,31 @@ HTML = os.path.abspath(os.path.join(RAIZ, "docs", "visor3d.html"))
 OUT = os.path.join(RAIZ, "docs", "img")
 
 
+PIEZAS = os.path.abspath(os.path.join(RAIZ, "docs", "piezas3d.html"))
+FOTOS_PIEZAS = ["vaso", "placa_portavasos_A", "torre_servo", "canaleta", "tolva_entrada", "soporte_sensor_ir",
+                "soporte_celular", "enganche_carro"]
+
+
+def piezas(b):
+    """Una captura por pieza -> docs/img/cad/<id>.png"""
+    os.makedirs(os.path.join(OUT, "cad"), exist_ok=True)
+    pg = b.new_page(viewport={"width": 760, "height": 600}, device_scale_factor=1.5)
+    errores = []
+    pg.on("pageerror", lambda e: errores.append(str(e)))
+    pg.goto("file://" + PIEZAS)
+    pg.wait_for_function("window.__piezas !== undefined", timeout=60000)
+    pg.add_style_tag(content=".app{grid-template-columns:1fr!important;grid-template-rows:100%!important}aside{display:none!important}")
+    pg.evaluate("window.__piezas.parar()")
+    for i in FOTOS_PIEZAS:
+        pg.evaluate(f"window.__piezas.mostrar('{i}')")
+        pg.evaluate("window.dispatchEvent(new Event('resize'))")
+        time.sleep(0.5)
+        pg.evaluate("window.__piezas.render()")
+        pg.screenshot(path=os.path.join(OUT, "cad", i + ".png"))
+        print("ok cad/" + i)
+    return errores
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     with sync_playwright() as p:
@@ -36,6 +61,7 @@ def main():
         foto("visor_general.png", "general", t=9.0)
         foto("visor_estacion.png", "estacion", t=0.0, vaso=1)
         foto("visor_pista.png", "pista", t=13.0)
+        errores += piezas(b)
         b.close()
         if errores:
             print("ERRORES JS:", *errores[:5], sep="\n  ")

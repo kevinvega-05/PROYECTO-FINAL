@@ -67,3 +67,19 @@ def test_la_escena_tiene_los_nodos_que_usa_el_visor(piezas):
 def test_termos_en_la_escena_coinciden_con_pista():
     pos = G.posiciones_termos()
     assert len(pos) == 3 and all(math.isfinite(v) for p in pos for v in p)
+
+
+def test_dibujos_y_catalogo_generados():
+    import os
+    raiz = os.path.join(os.path.dirname(__file__), "..")
+    for f in ("docs/img/cad_planta.png", "docs/img/cad_corte.png", "docs/piezas3d.html", "docs/img/cad/vaso.png"):
+        assert os.path.getsize(os.path.join(raiz, f)) > 1000, f
+
+
+def test_readme_explica_cada_pieza_con_su_imagen():
+    import os
+    raiz = os.path.join(os.path.dirname(__file__), "..")
+    txt = open(os.path.join(raiz, "README.md"), encoding="utf-8").read()
+    for img in ("vaso", "placa_portavasos_A", "torre_servo", "canaleta", "tolva_entrada",
+                "soporte_sensor_ir", "soporte_celular", "enganche_carro"):
+        assert f"docs/img/cad/{img}.png" in txt

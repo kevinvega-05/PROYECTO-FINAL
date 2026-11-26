@@ -330,6 +330,9 @@ def ref_carro():
     piezas.append(color(caja(-L / 2 + 30, L / 2 - 60, -32, 32, rr + 6, rr + 22), (20, 130, 80, 255)))      # Arduino + shield
     piezas.append(color(caja(L / 2 - 30, L / 2 - 16, -22, 22, rr - 6, rr + 8), (200, 200, 60, 255)))      # sensor de distancia
     piezas.append(color(caja(-L / 2 - 4, -L / 2 + 22, -10, 10, rr - 8, rr + 2), (255, 140, 0, 255)))        # pinza trasera
+    eng = enganche_carro()                                                                              # pasador de remolque real
+    eng.apply_translation([-L / 2 - 14, 0, rr + 2])
+    piezas.append(color(eng, (60, 200, 150, 255)))
     return trimesh.util.concatenate(piezas)
 
 
@@ -531,6 +534,41 @@ def guardar(imp, ref, sc):
     for n, m in ref.items():
         m.export(os.path.join(AQUI, "referencia", f"{n}.stl"))
     sc.export(os.path.join(AQUI, "escena.glb"))
+    guardar_piezas_glb(imp)
+
+
+COLORES_PIEZA = {
+    "vaso": (235, 190, 60), "placa_portavasos_A": (232, 232, 236), "placa_portavasos_B": (232, 232, 236),
+    "placa_portavasos_C": (232, 232, 236), "torre_servo": (240, 140, 30), "canaleta": (255, 215, 0),
+    "tolva_entrada": (90, 160, 230), "soporte_sensor_ir": (230, 70, 70), "base_poste_celular": (130, 135, 150),
+    "soporte_celular": (150, 120, 200), "enganche_carro": (60, 200, 150),
+}
+
+
+def pieza_orientada(nombre, m):
+    """Pone la pieza como se imprime: sobre z = 0 (la torre del servo va boca abajo)."""
+    m = m.copy()
+    if nombre == "torre_servo":
+        m.apply_transform(trimesh.transformations.rotation_matrix(math.pi, [1, 0, 0]))
+    m.apply_translation(-m.bounds[0] * np.array([0, 0, 1]) + np.array([-(m.bounds[0][0] + m.bounds[1][0]) / 2,
+                                                                       -(m.bounds[0][1] + m.bounds[1][1]) / 2, 0]))
+    return m
+
+
+def guardar_piezas_glb(imp):
+    sc = trimesh.Scene()
+    for n, m in imp.items():
+        sc.add_geometry(color(pieza_orientada(n, m), COLORES_PIEZA[n] + (255,)), node_name=n, geom_name=n + "_g")
+    sc.export(os.path.join(AQUI, "piezas.glb"))
+
+
+def info_piezas(imp):
+    out = []
+    for n, (_, cant, desc) in IMPRIMIBLES.items():
+        e = imp[n].extents
+        out.append({"id": n, "cant": cant, "desc": desc, "dims": [round(float(v), 1) for v in e],
+                    "vol": round(float(imp[n].volume) / 1000.0, 1)})
+    return out
 
 
 def tabla_piezas(imp):

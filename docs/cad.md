@@ -5,6 +5,11 @@ Todo sale de `cad/parametros.py` (única fuente de medidas) con `python cad/gene
 `cad/PIEZAS.md` (tabla con medidas y volúmenes). `--check` valida: mallas herméticas, que quepan en la cama de 220 mm,
 vasos sin tocarse, canaleta sin chocar con vasos ni torre a ningún ángulo del servo, y punta sobre cada vaso.
 
+## Imágenes
+* Planos 2D (`docs/img/cad_planta.png`, `cad_corte.png`): `python cad/dibujos.py` (usa `parametros.py`).
+* Catálogo interactivo `docs/piezas3d.html` y capturas `docs/img/cad/*.png`: `python visor3d/construir.py && python visor3d/capturar.py`.
+* Explicación pieza por pieza en el [README](../README.md#gemelo-digital-en-3d).
+
 ## Decisiones
 * **5 vasos** (uno por denominación) en un arco de R = 110 mm alrededor del pivote del servo, en los ángulos del
   firmware (20/45/90/135/160°). Los alojamientos de la placa están abiertos hacia afuera para que el carro saque el vaso.

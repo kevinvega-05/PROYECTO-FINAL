@@ -109,7 +109,7 @@ function ponerCarro(tt) {
   carro.rotation.set(0, 0, p.yaw);
   // el vaso despachado va enganchado detras del carro (su oreja apunta hacia el carro)
   const v = vasos[elegido];
-  const atras = D.carro_largo / 2 + D.vaso_de / 2 + 26;
+  const atras = D.atras;
   const cx = p.X - Math.cos(p.yaw) * atras, cy = p.Y - Math.sin(p.yaw) * atras;
   const base = vasoPos[elegido];
   v.rotation.z = p.yaw - (0);              // gira con el carro

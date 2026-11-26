@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catálogo de piezas 3D · monedas inteligentes</title>
+<style>
+:root{--bg:#0e1116;--panel:#171b22;--borde:#2a313c;--txt:#e8ecf2;--sub:#98a2b3;--acc:#f5c542}
+@media (prefers-color-scheme: light){:root{--bg:#f2f4f7;--panel:#fff;--borde:#d7dce3;--txt:#1b2230;--sub:#5b6577;--acc:#b8860b}}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.app{display:grid;grid-template-rows:100%;grid-template-columns:260px 1fr 280px;height:100%}
+aside{background:var(--panel);border-right:1px solid var(--borde);padding:14px;overflow:auto}
+aside.der{border-right:0;border-left:1px solid var(--borde)}
+h1{font-size:15px;margin:0 0 10px}h2{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--sub);margin:16px 0 4px}
+#lista button{display:flex;align-items:center;gap:8px;width:100%;text-align:left;font:inherit;color:var(--txt);background:transparent;border:1px solid transparent;border-radius:8px;padding:7px 8px;cursor:pointer}
+#lista button:hover{border-color:var(--borde)}#lista button.on{border-color:var(--acc);background:rgba(245,197,66,.1)}
+#lista small{margin-left:auto;color:var(--sub)}.pt{width:10px;height:10px;border-radius:50%;flex:none}
+#lienzo{min-width:0;min-height:0;position:relative;height:100%;overflow:hidden}#lienzo canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.dato{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid var(--borde);padding:6px 0;color:var(--sub)}.dato b{color:var(--txt);font-weight:600;text-align:right}
+label{display:flex;gap:6px;align-items:center;color:var(--sub);margin-top:14px}
+@media (max-width:860px){.app{grid-template-columns:1fr;grid-template-rows:auto 55% auto}aside{border:0;border-bottom:1px solid var(--borde)}#lista{display:flex;flex-wrap:wrap}#lista button{width:auto}}
+</style></head><body>
+<div class="app">
+<aside><h1>🧩 Piezas imprimibles</h1><div id="lista"></div></aside>
+<div id="lienzo"></div>
+<aside class="der"><h1 id="nombre"></h1><p id="desc" style="color:var(--sub);margin:0 0 8px"></p>
+<div class="dato"><span>Medidas (X×Y×Z)</span><b id="dims"></b></div>
+<div class="dato"><span>Volumen</span><b id="vol"></b></div>
+<div class="dato"><span>Cantidad a imprimir</span><b id="cant"></b></div>
+<label><input id="girar" type="checkbox" checked> Girar automáticamente</label>
+<p style="color:var(--sub);font-size:12px;margin-top:16px">Orientación de impresión mostrada (la torre del servo va boca abajo). Arrastra para girar, rueda para acercar. Generado por <code>cad/generar_cad.py</code>.</p></aside>
+</div>
+<script>window.DATOS = /*DATOS*/;</script><script>/*BUNDLE*/</script></body></html>
