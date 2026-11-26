@@ -166,5 +166,5 @@ stateDiagram-v2
 
 ## Calidad del código
 
-* `pytest` (81 pruebas): protocolo del carro, pista, planificador y despachador con hardware simulado, chatbot, tablero con `AppTest`, visión sobre video sintético, CAD, cálculos y **consistencia firmware↔software** (ángulos del servo, `MAX_TRAMOS`, tokens de ruta, factor de ruedas).
+* `pytest` (82 pruebas): protocolo del carro, pista, planificador y despachador con hardware simulado, chatbot, tablero con `AppTest`, visión sobre video sintético, CAD, cálculos y **consistencia firmware↔software** (ángulos del servo, `MAX_TRAMOS`, tokens de ruta, factor de ruedas).
 * `ruff` en CI; el demo (`python -m monedas --demo`) corre sin ventana en CI.

@@ -12,7 +12,7 @@ Proyecto de curso · Ingeniería Mecatrónica · Universidad Militar Nueva Grana
 ![Arduino](https://img.shields.io/badge/Arduino-carro-00979D?logo=arduino&logoColor=white)
 ![OpenCV](https://img.shields.io/badge/OpenCV-visi%C3%B3n-5C3EE8?logo=opencv&logoColor=white)
 ![Streamlit](https://img.shields.io/badge/Streamlit-tablero-FF4B4B?logo=streamlit&logoColor=white)
-![Tests](https://img.shields.io/badge/pruebas-81%20OK-3ddc97)
+![Tests](https://img.shields.io/badge/pruebas-82%20OK-3ddc97)
 ![Licencia](https://img.shields.io/badge/licencia-MIT-lightgrey)
 
 <img src="docs/img/hero.png" alt="Gemelo digital 3D: estación, vasos, carro y pista a escala" width="100%">
@@ -320,7 +320,7 @@ Todas pasan una validación automática de malla (herméticas, caben en 220 mm, 
 
 | Parte | Estado |
 |---|---|
-| Software (visión, planificador, despacho, chatbot, tablero, ruta) | ✅ Funciona en demo/simulación; **81 pruebas pasan**. Visión calibrada en banco con la cámara del celular. |
+| Software (visión, planificador, despacho, chatbot, tablero, ruta) | ✅ Funciona en demo/simulación; **82 pruebas pasan**. Visión calibrada en banco con la cámara del celular. |
 | Firmware ESP32 y Arduino | 🟡 Consistente con el software por pruebas estáticas; **sin compilar en CI**. La estación movió banda y servo; la banda aún no arrastra bien. |
 | Piezas 3D | 🟡 Generadas y validadas en malla, **sin imprimir**. Medidas `[?]` en `cad/parametros.py` por verificar con pie de rey. |
 | Pista y carro | 🟡 Pista y carro reales; largos de tramos medidos, separación entre ejes, `V_AVANCE` y `T_GIRO90` **provisionales**. El carro aún se desvía: falta afinar `K`. |
@@ -376,7 +376,7 @@ Más en [docs/problemas.md](docs/problemas.md).
 | `visor3d/` | Fuente del visor three.js y `construir.py` → `docs/visor3d.html` |
 | `herramientas/` | `panel_carro.html` (Web Bluetooth para mover el carro) |
 | `docs/` | `analisis_por_etapas`, `electrico`, `software`, `calculos`, guías, fotos y capturas |
-| `tests/` | 81 pruebas: software, protocolo, firmware↔software, CAD, cálculos |
+| `tests/` | 82 pruebas: software, protocolo, firmware↔software, CAD, cálculos |
 | `legacy/` | Versión anterior (carrusel de 9 cubículos y PyBullet), como referencia |
 
 ```bash
