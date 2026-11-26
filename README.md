@@ -23,6 +23,13 @@ con dos retornos en U y tres obstáculos. Un **tablero Streamlit** muestra canti
 | Carro | Falta ajustar el factor de ruedas `K` (el carro se desvía): ver [docs/problemas.md](docs/problemas.md). |
 | Pendiente de la canaleta | **14°**, limitada por la altura de la banda (80 mm). Es poca: usa superficie lisa; ver [docs/cad.md](docs/cad.md). |
 
+## Cumplimiento de la especificación
+
+El requisito (sistema contador funcional con transporte y embalaje, recolección y direccionamiento a la meta, con análisis
+mecánico, eléctrico y de software por etapa y la importancia del ESP32) se desarrolla en
+**[docs/analisis_por_etapas.md](docs/analisis_por_etapas.md)**, con una matriz de cumplimiento al final. El ESP32 es el
+corazón de la estación (banda + servo + sensor); el carro todavía usa Arduino UNO y el documento explica la mejora.
+
 ## Arquitectura
 
 ```mermaid
@@ -75,7 +82,7 @@ python -m monedas --fuente http://192.168.1.50:8080/video --puerto COM5 --carro-
 | `herramientas/panel_carro.html` | Panel web (Web Bluetooth) para mover el carro y mandarle la ruta |
 | `cad/` | `parametros.py` + `generar_cad.py` → STL, `escena.glb`, `PIEZAS.md` |
 | `visor3d/` | Fuente del visor (three.js) y `construir.py` que lo empaqueta en `docs/visor3d.html` |
-| `docs/` | Guías, diagramas y capturas |
+| `docs/` | Análisis por etapas, guías, diagramas y capturas |
 | `tests/` | 74 pruebas (software, protocolo del carro, firmware↔software, CAD) |
 | `legacy/` | Versión anterior (carrusel de 9 cubículos + PyBullet), conservada como referencia |
 
