@@ -8,9 +8,13 @@ Si el sistema no esta corriendo, muestra un aviso en lugar de fallar.
 """
 import json
 import os
+import sys
 import time
 
 import streamlit as st
+
+# `streamlit run monedas/dashboard.py` solo agrega la carpeta del script al path: agregamos la raiz del proyecto
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from monedas import config as cfg
 from monedas.chatbot import enviar_despacho

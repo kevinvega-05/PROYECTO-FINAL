@@ -87,7 +87,7 @@ derecha: se compensa con avance controlado (`F1000` + `L40`) y con el factor de 
 
 **Eléctrico.** Arduino UNO + shield LAFVIN (puente H) + módulo BLE JDY-16 (3,3 V; UNO a 5 V → divisor de tensión en RX
 del módulo) + sensor de distancia frontal. Los motores van de las pilas del shield; el UNO y el BLE comparten GND.
-Tensión de pilas baja = mismo comando, distinta velocidad: recalibrar `V_AVANCE` cuando cambien las pilas **(sin medir)**.
+El carro lleva **2 celdas 18650 «UltraFire»** en portapilas (se ven en la foto; la etiqueta de 6800 mAh no es creíble, ver [calculos.md](calculos.md)). Tensión de pilas baja = mismo comando, distinta velocidad: recalibrar `V_AVANCE` cuando cambien las pilas **(sin medir)**.
 
 **Software.** `pista.py` genera la ruta (≤ 120 tramos `F/B/L/R/S` + ms) y `hardware.CarroBLE` la envía por BLE en
 trozos de 20 bytes (`C`, `A…`, `E`). El `Despachador` verifica que el vaso no esté vacío y que el carro esté libre, espera

@@ -18,8 +18,8 @@ from monedas.tipos import TIPOS
 
 @dataclass
 class Supuestos:
-    # ---- carro (SUPUESTOS: Kevin no ha dicho que bateria usa: mide y cambia)
-    bateria_mah: float = 2200.0          # 2 celdas 18650 en serie, capacidad nominal
+    # ---- carro (las celdas se ven en la foto; su capacidad REAL es un supuesto: mide con una prueba de descarga)
+    bateria_mah: float = 1500.0          # 2 celdas 18650 UltraFire (foto del carro). Etiqueta: 6800 mAh (inflada); real ~1000-2000
     bateria_v: float = 7.4
     usable: float = 0.80                 # fraccion de la capacidad que se aprovecha (tension de corte, envejecimiento)
     motor_ma: float = 250.0              # corriente de cada motor TT con carga (tipico 150-250; atascado > 700)

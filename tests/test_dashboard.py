@@ -22,3 +22,14 @@ def test_dashboard_muestra_los_5_vasos():
     botones = [b for b in at.button if b.label == "Despachar"]
     assert len(botones) == 5
     assert [b.disabled for b in botones] == [True, False, True, True, True]
+
+
+def test_streamlit_run_funciona_sin_instalar_el_paquete():
+    """Regresion: `streamlit run monedas/dashboard.py` fallaba con ModuleNotFoundError fuera de pytest."""
+    import subprocess
+    import sys
+    code = ("import runpy,sys;sys.path=[p for p in sys.path if 'proyecto' not in p];"
+            f"sys.path.insert(0, {str(Path(DASH).parent)!r});"
+            f"src=open({DASH!r}).read();compile(src,'d','exec')")
+    assert subprocess.run([sys.executable, "-c", code], cwd="/tmp").returncode == 0
+    assert "sys.path.insert(0" in Path(DASH).read_text(encoding="utf-8")

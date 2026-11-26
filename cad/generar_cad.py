@@ -335,12 +335,12 @@ def ref_carro():
 
 def ref_banda():
     W, Lg, Z = P.BANDA_ANCHO, P.BANDA_LARGO, P.BANDA_ALTO
-    pz = [color(caja(-Lg, 0, -W / 2, W / 2, Z - 12, Z - 2), (30, 30, 30, 255))]
+    pz = [color(caja(-Lg, 0, -W / 2, W / 2, Z - 12, Z - 2), (105, 108, 114, 255))]
     for s in (1, -1):
-        pz.append(color(caja(-Lg, 0, s * W / 2 - (3 if s > 0 else -3) - 3, s * W / 2 - (3 if s > 0 else -3) + 3, 0, Z), (170, 170, 175, 255)))
+        pz.append(color(caja(-Lg, 0, s * W / 2 - (3 if s > 0 else -3) - 3, s * W / 2 - (3 if s > 0 else -3) + 3, 0, Z), (238, 238, 240, 255)))
     for x in (-Lg + 20, -20):
         for s in (1, -1):
-            pz.append(color(caja(x - 15, x + 15, s * (W / 2 - 6) - 3, s * (W / 2 - 6) + 3, 0, Z - 12), (150, 150, 155, 255)))
+            pz.append(color(caja(x - 15, x + 15, s * (W / 2 - 6) - 3, s * (W / 2 - 6) + 3, 0, Z - 12), (110, 112, 118, 255)))
     return trimesh.util.concatenate(pz)
 
 

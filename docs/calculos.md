@@ -8,7 +8,7 @@ y deben cambiarse por lo que mida con el multímetro. Valores "típicos" = hojas
 
 | Dato | Valor por defecto | Origen |
 |---|---|---|
-| Batería del carro | 2 × 18650 en serie, 7,4 V, 2200 mAh | **(supuesto)**: no se ha dicho qué batería usa |
+| Batería del carro | 2 × 18650 «UltraFire» en serie, 7,4 V, **1500 mAh reales** | Las celdas se ven en la foto del carro y dicen «6800 mAh»: esa cifra es imposible para una 18650 (las mejores rondan 3000–3500 mAh), así que se usa **1500 mAh (supuesto)** |
 | Fracción utilizable de la batería | 80 % | típico |
 | Corriente por motor TT con carga | 250 mA (atascado > 700) | típico |
 | Lógica del carro (UNO + JDY-16 + sensor) | 70 mA | típico |
@@ -21,30 +21,32 @@ y deben cambiarse por lo que mida con el multímetro. Valores "típicos" = hojas
 
 ## 1. Cuánto tiempo puede estar encendido el carro
 
-Corriente en movimiento: `I = 2·I_motor + I_lógica = 2·250 + 70 = 570 mA`. Capacidad útil: `2200 · 0,8 = 1760 mAh`.
+Corriente en movimiento: `I = 2·I_motor + I_lógica = 2·250 + 70 = 570 mA`. Capacidad útil: `1500 · 0,8 = 1200 mAh`.
 
 | Resultado | Fórmula | Valor |
 |---|---|---|
-| Tiempo **moviéndose sin parar** | 1760 / 570 | **≈ 3,1 h** |
-| Tiempo **en reposo** (solo lógica) | 1760 / 70 | ≈ 25 h |
+| Tiempo **moviéndose sin parar** | 1200 / 570 | **≈ 2,1 h** |
+| Tiempo **en reposo** (solo lógica) | 1200 / 70 | ≈ 17 h |
 | Duración de un viaje (ruta + enganche) | 17,8 s + 0,8 s | 18,6 s |
 | Consumo por viaje | 570 mA · 18,6 s / 3600 | ≈ 2,9 mAh (≈ 0,022 Wh) |
-| **Viajes por carga** (con 60 s de espera entre viajes) | 1760 / (2,9 + 1,2) | **≈ 430 viajes** |
-| Horas de uso con ese ciclo | 430 · 78,6 s | ≈ 9,4 h |
+| **Viajes por carga** (con 60 s de espera entre viajes) | 1200 / (2,9 + 1,2) | **≈ 290 viajes** |
+| Horas de uso con ese ciclo | 292 · 78,6 s | ≈ 6,4 h |
 
-Sensibilidad a la batería (misma corriente de motores salvo que se indique):
+Sensibilidad (misma corriente de motores salvo que se indique):
 
 | Batería | Moviéndose | Viajes por carga | Horas con ciclo |
 |---|---|---|---|
-| 2×18650, 2200 mAh (supuesto) | 3,1 h | 429 | 9,4 h |
-| 2×18650, 2600 mAh | 3,6 h | 506 | 11,1 h |
+| Lo que dice la etiqueta: «6800 mAh» (**no es real**) | 9,5 h | 1324 | 28,9 h |
+| 2×18650 de calidad, ~3000 mAh | 4,2 h | 584 | 12,8 h |
+| **2×UltraFire reales, ~1500 mAh (por defecto)** | **2,1 h** | **292** | **6,4 h** |
+| 2×UltraFire envejecidas, ~1000 mAh | 1,4 h | 195 | 4,3 h |
+| 2×UltraFire 1500 mAh, motores a 350 mA (más fricción) | 1,6 h | 234 | 5,1 h |
 | 4×AA alcalinas (~1800 mAh a 0,5 A) | 2,5 h | 351 | 7,7 h |
-| Bloque de 9 V (~400 mAh) | 0,6 h | 78 | 1,7 h |
-| 2×18650, motores a 350 mA (más carga/fricción) | 2,3 h | 342 | 7,5 h |
 
-**Conclusión:** para una demostración (decenas de viajes) cualquier opción de arriba alcanza, salvo el bloque de 9 V, que
-no entrega la corriente de los motores. El factor que más cambia el resultado es la corriente real de los motores:
-mídela con el multímetro **en serie** con la batería mientras el carro avanza remolcando un vaso.
+**Conclusión:** para una demostración (decenas de viajes) sobra autonomía incluso con celdas envejecidas. El factor que más
+cambia el resultado es la capacidad real de las celdas (la etiqueta miente) y la corriente de los motores. Dos formas de
+medirlo: (a) multímetro **en serie** con la batería mientras el carro avanza remolcando un vaso; (b) **prueba de campo**:
+carga completa, repite la ruta cada 60 s y anota cuántos viajes hace antes de que baje la velocidad.
 El puente H cae ≈ 1,4 V **(típico)**, así que con 7,4 V cada motor recibe ≈ 6 V; con 4×AA (6 V) recibiría ≈ 4,6 V y el carro
 iría más lento: `V_AVANCE` cambia con la carga de la batería, hay que recalibrarlo.
 

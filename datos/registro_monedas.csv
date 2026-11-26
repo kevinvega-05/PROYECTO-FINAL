@@ -11,3 +11,72 @@ fecha,evento,valor,cubiculo,detalle
 2026-11-25 21:27:18,moneda,200,2,200_antigua
 2026-11-25 21:27:20,camara,,,cruzo la linea
 2026-11-25 21:27:21,moneda,,,no reconocida -> rechazo
+2026-11-25 23:09:08,camara,100,1,cruzo la linea
+2026-11-25 23:09:09,moneda,100,1,100_actual
+2026-11-25 23:09:11,camara,1000,4,cruzo la linea
+2026-11-25 23:09:13,moneda,1000,4,1000_actual
+2026-11-25 23:09:15,camara,50,0,cruzo la linea
+2026-11-25 23:09:16,moneda,50,0,50_actual
+2026-11-25 23:09:18,camara,500,3,cruzo la linea
+2026-11-25 23:09:20,moneda,500,3,500_actual
+2026-11-25 23:09:22,camara,200,2,cruzo la linea
+2026-11-25 23:09:23,moneda,200,2,200_antigua
+2026-11-25 23:09:25,camara,,,cruzo la linea
+2026-11-25 23:09:26,moneda,,,no reconocida -> rechazo
+2026-11-25 23:09:29,camara,50,0,cruzo la linea
+2026-11-25 23:09:30,moneda,50,0,50_actual
+2026-11-25 23:09:32,camara,500,3,cruzo la linea
+2026-11-25 23:09:34,moneda,500,3,500_actual
+2026-11-25 23:09:36,camara,100,1,cruzo la linea
+2026-11-25 23:09:37,moneda,100,1,100_actual
+2026-11-25 23:09:39,camara,1000,4,cruzo la linea
+2026-11-25 23:09:41,moneda,1000,4,1000_actual
+2026-11-25 23:09:43,camara,100,1,cruzo la linea
+2026-11-25 23:09:44,moneda,100,1,100_actual
+2026-11-25 23:09:46,camara,1000,4,cruzo la linea
+2026-11-25 23:09:48,moneda,1000,4,1000_actual
+2026-11-25 23:09:50,camara,50,0,cruzo la linea
+2026-11-25 23:09:51,moneda,50,0,50_actual
+2026-11-25 23:09:53,camara,500,3,cruzo la linea
+2026-11-25 23:09:55,moneda,500,3,500_actual
+2026-11-25 23:09:57,camara,200,2,cruzo la linea
+2026-11-25 23:09:58,moneda,200,2,200_antigua
+2026-11-25 23:10:00,camara,,,cruzo la linea
+2026-11-25 23:10:02,moneda,,,no reconocida -> rechazo
+2026-11-25 23:10:03,camara,100,1,cruzo la linea
+2026-11-25 23:10:04,camara,50,0,cruzo la linea
+2026-11-25 23:10:05,moneda,100,1,100_actual
+2026-11-25 23:10:05,moneda,50,0,50_actual
+2026-11-25 23:10:07,camara,1000,4,cruzo la linea
+2026-11-25 23:10:08,moneda,1000,4,1000_actual
+2026-11-25 23:10:10,camara,50,0,cruzo la linea
+2026-11-25 23:10:12,moneda,50,0,50_actual
+2026-11-25 23:10:14,camara,500,3,cruzo la linea
+2026-11-25 23:10:15,moneda,500,3,500_actual
+2026-11-25 23:10:17,camara,200,2,cruzo la linea
+2026-11-25 23:10:19,moneda,200,2,200_antigua
+2026-11-25 23:10:21,camara,,,cruzo la linea
+2026-11-25 23:10:22,moneda,,,no reconocida -> rechazo
+2026-11-25 23:10:24,camara,50,0,cruzo la linea
+2026-11-25 23:10:26,moneda,50,0,50_actual
+2026-11-25 23:10:28,camara,500,3,cruzo la linea
+2026-11-25 23:10:29,moneda,500,3,500_actual
+2026-11-25 23:10:31,camara,100,1,cruzo la linea
+2026-11-25 23:10:33,moneda,100,1,100_actual
+2026-11-25 23:10:35,camara,1000,4,cruzo la linea
+2026-11-25 23:10:36,moneda,1000,4,1000_actual
+2026-11-25 23:10:38,camara,100,1,cruzo la linea
+2026-11-25 23:10:40,moneda,100,1,100_actual
+2026-11-25 23:10:42,camara,1000,4,cruzo la linea
+2026-11-25 23:10:43,moneda,1000,4,1000_actual
+2026-11-25 23:10:45,camara,50,0,cruzo la linea
+2026-11-25 23:10:47,moneda,50,0,50_actual
+2026-11-25 23:10:49,camara,500,3,cruzo la linea
+2026-11-25 23:10:50,moneda,500,3,500_actual
+2026-11-25 23:10:52,camara,200,2,cruzo la linea
+2026-11-25 23:10:54,moneda,200,2,200_antigua
+2026-11-25 23:10:56,camara,,,cruzo la linea
+2026-11-25 23:10:57,moneda,,,no reconocida -> rechazo
+2026-11-25 23:10:59,camara,50,0,cruzo la linea
+2026-11-25 23:11:01,moneda,50,0,50_actual
+2026-11-25 23:11:03,camara,500,3,cruzo la linea
