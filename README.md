@@ -466,3 +466,85 @@ make cad && make visor      # regenerar piezas y visor 3D
 ```
 
 CI (`.github/workflows/ci.yml`): pruebas, ruff, demo sin ventana, generación del CAD y del visor.
+
+## Lo que faltó: balance honesto del proyecto
+
+> **En una frase:** cada etapa funcionó *por separado*, pero **no alcanzamos a ver las cuatro funcionando juntas de principio a fin**. Esta sección dice qué falló, por qué creemos que falló y qué haríamos con más tiempo. Lo que es causa *probable* (no medida) está marcado así.
+
+```mermaid
+flowchart LR
+    A["👁️ Visión<br/>✅ clasifica en banco"] -.->|"integrado: ❌ no se vio de punta a punta"| B["🔴 Banda<br/>⚠️ motor dañado"]
+    B -.-> C["🪣 Canaleta + servo<br/>✅ apunta al vaso"]
+    C -.-> D["🚗 Carro<br/>⚠️ se sale de la pista"]
+    style A fill:#143d2b,stroke:#3ddc97,color:#fff
+    style B fill:#4a1717,stroke:#ff5252,color:#fff
+    style C fill:#143d2b,stroke:#3ddc97,color:#fff
+    style D fill:#4a3a10,stroke:#f5c542,color:#fff
+```
+
+### 1 · «Por separado sí, todo junto no»
+
+| Prueba aislada | Resultado | Al conectar todo |
+|---|---|---|
+| Visión con el celular (banco) | ✅ clasificaba las 9 clases | La banda no entregaba la moneda de forma estable bajo la cámara |
+| Servo + canaleta | ✅ apuntaba a los 5 vasos | Dependía de que la moneda llegara a la canaleta, y no llegaba bien |
+| Carro con la app/panel BLE | ✅ avanzaba, giraba y respondía | Con la ruta completa acumulaba el error y salía de la pista |
+| Software (planificador, chatbot, tablero) | ✅ 84 pruebas y demo simulada | La demo es simulación: **no equivale a una prueba con los 4 módulos reales** |
+
+**Por qué es tan común (y qué nos enseñó):** cada módulo se probó con la fuente de alimentación, el cableado y las condiciones ideales de *su* banco de pruebas.
+Al unirlos aparecen cosas que ningún módulo tenía solo: **tolerancias que se suman** (una moneda que llega 5 mm corrida ya no cae en la canaleta), **tiempos que dependen unos de otros** (el servo debe llegar antes que la moneda) y **recursos compartidos** (alimentación, tierra común, ruido de motores sobre el sensor y el ESP32).
+Nos faltó una **prueba de integración temprana** con las piezas reales, aunque fuera fea, en vez de dejarla para el final.
+
+### 2 · El carro: funcionaba, pero no se mantenía en la pista
+
+Lo que **sí** logramos: movimiento por Bluetooth, rutas cargadas por tramos (`C`/`A…`/`E`), 72 tramos generados desde las medidas reales de la pista y un gemelo digital que los recorre sin chocar con los termos.
+
+Lo que **no**: seguir esa ruta en el piso real sin salirse.
+
+| Qué pasaba | Causa probable | Cómo se mitigó | Qué falta |
+|---|---|---|---|
+| Se desviaba siempre al mismo lado | Ruedas/motores distintos (≈ 9,5 % de diferencia, ver [cálculos](docs/calculos.md)) | `K` por rueda + corrección `L40` cada metro | Calibrar `K` con el carro **cargado** y la batería a distintos niveles |
+| Giraba en círculos al arrancar | `K100,50` quedó guardado en la EEPROM | Valor por defecto `100,100` + prueba automática | — |
+| El error crecía a lo largo de la ruta | **Lazo abierto**: las órdenes son tiempos (ms), sin saber dónde está realmente | Tramos cortos y correcciones | **Realimentación**: encoders o giroscopio; hoy el carro «adivina» su posición |
+| Los giros en U no cerraban igual cada vez | `T_GIRO90` y `V_AVANCE` son **provisionales**; dependen de batería y piso | Giro en pasos de 30° | Medir con cinta y cronómetro, y recalibrar al cambiar de batería |
+| Arrastrar el vaso cambia el comportamiento | El vaso lleno agrega peso y fricción atrás | — | Ajustar `K` con carga real |
+
+**Lo central:** controlar un carro con *tiempos* funciona en distancias cortas, pero los errores se **acumulan** (las pequeñas diferencias de rueda, batería y piso se integran). Es el límite natural del lazo abierto, y por eso la mejora más valiosa no es más código de ruta, sino **un sensor que mida lo que el carro realmente hizo**.
+
+### 3 · La banda: el problema del motor
+
+La banda era la pieza **más crítica** (sin ella no hay flujo continuo de monedas) y la que más nos frenó:
+
+- **El motor se dañó** durante las pruebas, y nos quedamos sin la etapa de transporte funcionando de forma confiable cuando más la necesitábamos.
+- Antes del daño ya había señales: **la banda no arrastraba bien** (patinaba o no vencía la fricción a baja velocidad).
+- Causas **probables** (no las medimos todas): par insuficiente del motor TT a la velocidad baja que pedimos por PWM; fricción de la banda sobre su apoyo; tensión mal ajustada; y, si el motor trabajó trabado contra una carga, **sobrecalentamiento o corriente alta**, que es una forma típica de dañarlo.
+- Lo que **sí** quedó listo: el control de velocidad por PWM (`PWM_MIN` para vencer el arranque), el sensor de presencia y el estimado de corriente de la estación (**0,67 A normal · 1,57 A peor caso**, ver [cálculos](docs/calculos.md)).
+
+**Qué haríamos distinto:**
+1. Probar la banda **con carga real** desde el primer día (monedas + cubierta de cartulina), no solo en vacío.
+2. **Medir la corriente** del motor (un multímetro en serie basta) y comparar con el límite del L298N.
+3. Poner un **motorreductor con más par** o reducir la fricción de la banda; dejar un **motor de repuesto**.
+4. Alimentar el motor de una fuente **independiente** del ESP32 (con tierra común) para que sus picos no reinicien ni ensucien la lectura del sensor.
+
+### 4 · Otras cosas que quedaron abiertas
+
+| Pendiente | Impacto |
+|---|---|
+| Piezas CAD **sin imprimir** y medidas `[?]` sin verificar | El selector real puede no encajar a la primera |
+| Canaleta a **14°** (poca pendiente) | La moneda puede quedarse en el canal; usar canal liso o subir la banda |
+| Aviso de **«vaso lleno»** sin implementar | Un vaso podría desbordarse sin que el sistema lo sepa |
+| Firmware **sin compilar en CI** | Los errores de compilación solo se ven al cargarlo a la placa |
+| Carro en **Arduino UNO + JDY-16**, no ESP32 | Sin telemetría ni BLE integrado; el ESP32 es la ruta natural de mejora |
+| Separación entre ejes de la pista (320 mm) **sin confirmar** | Cambia las trayectorias de los esquives |
+
+### 5 · Si tuviéramos una semana más (en orden de impacto)
+
+1. **Banda funcionando** con un motor nuevo, con corriente medida y carga real.
+2. **Prueba de integración** estación → carro, aunque sea con 1 sola moneda y 1 solo vaso.
+3. **Realimentación del carro** (encoders o giroscopio) para cerrar el lazo y dejar de acumular error.
+4. Imprimir el CAD, verificar las medidas `[?]` y corregir `parametros.py`.
+5. Aviso de vaso lleno y migración del carro a ESP32.
+
+### Lo que sí se logró
+
+Aunque la integración final no salió, quedó: un **software completo y probado** (84 pruebas), una **visión calibrada**, **firmware coherente con el protocolo**, un **gemelo digital** con las piezas listas para imprimir, **cálculos de ingeniería** y un repositorio que documenta con claridad *qué funciona, qué no y por qué*. Eso último también es resultado: sabemos exactamente **dónde está el siguiente paso**.
